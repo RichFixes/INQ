@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UwemMedia — Book Your Vision</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201,168,76,0.15);
+      --bg: #050508;
+      --glass: rgba(8, 8, 14, 0.72);
+      --glass-border: rgba(201,168,76,0.2);
+      --text: #f5f0e8;
+      --muted: rgba(245,240,232,0.45);
+      --input-bg: rgba(255,255,255,0.04);
+      --input-border: rgba(201,168,76,0.25);
+      --input-focus: rgba(201,168,76,0.6);
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Video Background (Vertical — Blurred Sides) ── */
+    .video-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: #050508;
+    }
+
+    /* Layer 1: blurred, darkened, stretched background fill */
+    .video-blur {
+      position: absolute;
+      inset: -60px;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    .video-blur video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(32px) brightness(0.18) saturate(0.5);
+      transform: scale(1.12);
+    }
+    .video-blur.loaded { opacity: 1; }
+
+    /* Layer 2: sharp vertical video centered */
+    .video-main {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1.4s ease 0.15s;
+    }
+    .video-main video {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+    }
+    .video-main.loaded { opacity: 1; }
+
+    /* Layer 3: cinematic overlay — heavier on left where text lives */
+    .video-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        linear-gradient(to right,
+          rgba(5,5,8,0.95) 0%,
+          rgba(5,5,8,0.55) 28%,
+          rgba(5,5,8,0.3)  50%,
+          rgba(5,5,8,0.55) 72%,
+          rgba(5,5,8,0.95) 100%),
+        linear-gradient(to bottom,
+          rgba(5,5,8,0.6) 0%,
+          transparent 15%,
+          transparent 85%,
+          rgba(5,5,8,0.85) 100%);
+    }
+
+    /* Grain texture overlay */
+    .grain {
+      position: fixed;
+      inset: -200%;
+      width: 400%;
+      height: 400%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(2) infinite;
+    }
+    @keyframes grain {
+      0%, 100% { transform: translate(0, 0); }
+      25%       { transform: translate(-1%, 1%); }
+      50%       { transform: translate(1%, -1%); }
+      75%       { transform: translate(-1%, -1%); }
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 0;
+    }
+
+    /* ── Left — Brand Panel ── */
+    .brand-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 56px;
+      position: relative;
+    }
+
+    .brand-top { display: flex; flex-direction: column; gap: 0; }
+
+    .logo-wrap {
+      margin-bottom: 48px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease 0.2s forwards;
+    }
+
+    .logo-wrap img {
+      height: 44px;
+      filter: brightness(0) invert(1);
+      opacity: 0.9;
+    }
+
+    .brand-eyebrow {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.4s forwards;
+    }
+
+    .brand-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 7vw, 110px);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      color: var(--text);
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .brand-headline em {
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--gold-light);
+      font-size: 1.08em;
+      letter-spacing: 1px;
+    }
+
+    .brand-sub {
+      margin-top: 28px;
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 380px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.65s forwards;
+    }
+
+    /* Services list */
+    .services {
+      margin-top: 56px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.8s forwards;
+    }
+
+    .service-line {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+      cursor: default;
+      transition: padding-left 0.3s ease;
+    }
+    .service-line:hover { padding-left: 6px; }
+
+    .service-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+    .service-line:hover .service-dot { transform: scale(1.6); }
+
+    .service-name {
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+    .service-line:hover .service-name { color: var(--text); }
+
+    /* Brand bottom */
+    .brand-bottom {
+      opacity: 0;
+      animation: fadeUp 0.8s ease 1s forwards;
+    }
+
+    .brand-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      border-left: 2px solid var(--gold);
+      padding-left: 18px;
+      max-width: 360px;
+    }
+
+    /* ── Right — Form Panel ── */
+    .form-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      border-left: 1px solid rgba(201,168,76,0.08);
+      background: var(--glass);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      opacity: 0;
+      animation: fadeIn 1s ease 0.3s forwards;
+    }
+
+    .form-inner {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .form-header { margin-bottom: 32px; }
+
+    .form-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .form-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .form-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin-top: 14px;
+      opacity: 0.6;
+    }
+
+    /* Flash messages */
+    .flash-msg {
+      background: rgba(255,80,80,0.1);
+      border: 1px solid rgba(255,80,80,0.25);
+      color: #ff9090;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    /* Form fields */
+    .field { margin-bottom: 18px; }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 7px;
+      opacity: 0.85;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.25s, background 0.25s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--input-focus);
+      background: rgba(201,168,76,0.04);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: rgba(245,240,232,0.2);
+    }
+
+    select {
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    select option {
+      background: #12121a;
+      color: var(--text);
+    }
+
+    textarea {
+      resize: none;
+      height: 90px;
+      line-height: 1.6;
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 5px;
+      letter-spacing: 1px;
+    }
+
+    /* Submit button */
+    .submit-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 15px 24px;
+      background: transparent;
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      color: var(--gold-light);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.35s ease;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateX(-101%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+
+    .submit-btn:hover::before { transform: translateX(0); }
+    .submit-btn:hover { color: #050508; }
+
+    .submit-btn span { position: relative; z-index: 1; }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 900px) {
+      .page {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+      }
+
+      .brand-panel {
+        padding: 36px 28px 28px;
+        border-bottom: 1px solid rgba(201,168,76,0.1);
+      }
+
+      .brand-headline { font-size: 56px; }
+      .services { display: none; }
+      .brand-bottom { display: none; }
+
+      .form-panel {
+        border-left: none;
+        padding: 32px 24px 48px;
+        align-items: flex-start;
+      }
+
+      .field-row { grid-template-columns: 1fr; gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Grain overlay -->
+  <div class="grain"></div>
+
+  <!-- Video Background: blurred fill + sharp vertical center -->
+  <div class="video-wrap">
+    <!-- Blurred background layer (fills sides) -->
+    <div class="video-blur" id="videoBlur">
+      <video autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
+      </video>
+    </div>
+    <!-- Sharp vertical video centered -->
+    <div class="video-main" id="videoMain">
+      <video autoplay muted loop playsinline id="bgVideo">
+        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <!-- Page Layout -->
+  <div class="page">
+
+    <!-- Left: Brand -->
+    <div class="brand-panel">
+      <div class="brand-top">
+        <div class="logo-wrap">
+          <img src="{{ url_for('static', filename='Uwem_Logo.png') }}" alt="UwemMedia">
+        </div>
+
+        <h1 class="brand-headline">
+          YOUR<br>
+          STORY<br>
+          <em>Deserves</em><br>
+          THE LENS
+        </h1>
+
+        <p class="brand-sub">
+          We don't just film events — we craft the visual legacy your moments deserve. Built for promoters, artists, and creatives who move different.
+        </p>
+
+        <div class="services">
+          <div class="service-line"><div class="service-dot"></div><span class="service-name">Music Video Production</span></div>
+          <div class="service-line"><div class="service-dot"></div><span class="service-name">Event Recap Coverage</span></div>
+          <div class="service-line"><div class="service-dot"></div><span class="service-name">Commercial & Brand Ads</span></div>
+          <div class="service-line"><div class="service-dot"></div><span class="service-name">Podcast & Interview</span></div>
+          <div class="service-line"><div class="service-dot"></div><span class="service-name">Documentary & Short Film</span></div>
+        </div>
+      </div>
+
+      <div class="brand-bottom">
+        <p class="brand-quote">
+          "Every frame is a choice.<br>We make the ones that last."
+        </p>
+      </div>
+    </div>
+
+    <!-- Right: Form -->
+    <div class="form-panel">
+      <div class="form-inner">
+
+        <div class="form-header">
+          <div class="form-eyebrow">Start Here</div>
+          <h2 class="form-title">Book<br>With Us</h2>
+          <div class="form-divider"></div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash-msg">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <form action="/submit" method="post">
+
+          <div class="field-row">
+            <div class="field">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" placeholder="Full name" oninput="sanitizeInput(this)" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="you@email.com" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="service">Service Type</label>
+            <select id="service" name="service" required>
+              <option value="" disabled selected>Select a service</option>
+              <option value="Music Video">Music Video</option>
+              <option value="Event Coverage">Event Recap / Coverage</option>
+              <option value="Commercial Ad">Commercial Ad</option>
+              <option value="Podcast Recording">Podcast / Interview</option>
+              <option value="Documentary">Documentary / Short Film</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="date">Event Date</label>
+              <input type="date" id="date" name="date" required>
+            </div>
+            <div class="field">
+              <label for="package">Package</label>
+              <select id="package" name="package" required>
+                <option value="" disabled selected>Select package</option>
+                <option value="basic">Basic — $100–250</option>
+                <option value="standard">Standard — $300–500</option>
+                <option value="premium">Premium — $600+</option>
+                <option value="custom">Custom Quote</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="details">Tell Us Your Vision</label>
+            <textarea
+              id="details"
+              name="details"
+              maxlength="500"
+              placeholder="Location, vibe, duration, special requirements..."
+              oninput="handleDetails(this)"
+              required></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 500</div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>Submit Inquiry →</span>
+          </button>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Fade in both video layers once the main video is ready
+    const bgVideo = document.getElementById('bgVideo');
+    const videoMain = document.getElementById('videoMain');
+    const videoBlur = document.getElementById('videoBlur');
+
+    function revealVideo() {
+      videoMain.classList.add('loaded');
+      videoBlur.classList.add('loaded');
+    }
+
+    bgVideo.addEventListener('canplaythrough', revealVideo);
+    if (bgVideo.readyState >= 3) revealVideo();
+
+    // Input sanitizer
+    function sanitizeInput(el) {
+      el.value = el.value.replace(/[^a-zA-Z0-9\s.,!?'\-@]/g, '');
+    }
+
+    // Details field with char counter
+    function handleDetails(el) {
+      document.getElementById('charCount').textContent = el.value.length;
+    }
+  </script>
+
+</body>
+</html>

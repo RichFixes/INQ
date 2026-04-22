@@ -1,0 +1,7 @@
+reportlab
+python-dotenv
+gunicorn==23.0.0
+requests
+pillow
+Flask>=2.0
+pytest

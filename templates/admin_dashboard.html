@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — UwemMedia Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #222230;
+      --accent: #e8ff47;
+      --text: #f0f0f0;
+      --muted: #55556a;
+      --green: #47ffb2;
+      --blue: #47b2ff;
+      --orange: #ffb247;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header-left img { max-height: 32px; filter: brightness(0) invert(1); }
+
+    .header-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.3px;
+    }
+
+    .badge {
+      background: var(--accent);
+      color: #0a0a0f;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-family: 'Syne', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .logout-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--muted); color: var(--text); }
+
+    /* Main */
+    main { padding: 40px 32px; max-width: 1200px; margin: 0 auto; }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 36px;
+    }
+
+    /* Stats row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .stat-value.green { color: var(--green); }
+    .stat-value.blue  { color: var(--blue); }
+    .stat-value.orange { color: var(--orange); }
+    .stat-value.accent { color: var(--accent); }
+
+    /* Empty state */
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+
+    /* Table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      padding: 14px 20px;
+      text-align: left;
+      font-weight: 500;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    td {
+      padding: 16px 20px;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .client-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .client-email { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+    .pkg-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .pkg-basic    { background: rgba(71,178,255,0.15); color: var(--blue); }
+    .pkg-standard { background: rgba(232,255,71,0.15); color: var(--accent); }
+    .pkg-premium  { background: rgba(71,255,178,0.15); color: var(--green); }
+    .pkg-custom   { background: rgba(255,178,71,0.15); color: var(--orange); }
+
+    .service-tag {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .view-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 7px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .view-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <img src="{{ url_for('static', filename='Uwem_Logo.png') }}" alt="UwemMedia">
+    <span class="header-title">UwemMedia</span>
+    <span class="badge">Admin</span>
+  </div>
+  <a href="{{ url_for('admin_logout') }}" class="logout-btn">Log out</a>
+</header>
+
+<main>
+  <h1 class="page-title">Inquiries</h1>
+  <p class="page-subtitle">All client submissions — newest first</p>
+
+  <!-- Stats -->
+  {% set total = submissions | length %}
+  {% set premium_count = submissions | selectattr('package', 'equalto', 'Premium') | list | length %}
+  {% set custom_count  = submissions | selectattr('package', 'equalto', 'Custom')  | list | length %}
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Total Inquiries</div>
+      <div class="stat-value accent">{{ total }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Premium Packages</div>
+      <div class="stat-value green">{{ premium_count }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Custom Quotes</div>
+      <div class="stat-value orange">{{ custom_count }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">AI Briefs Generated</div>
+      <div class="stat-value blue">{{ total }}</div>
+    </div>
+  </div>
+
+  {% if submissions %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Package</th>
+          <th>Event Date</th>
+          <th>Submitted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in submissions %}
+        <tr>
+          <td style="color: var(--muted); font-size:12px;">{{ s.id }}</td>
+          <td>
+            <div class="client-name">{{ s.name }}</div>
+            <div class="client-email">{{ s.email }}</div>
+          </td>
+          <td><span class="service-tag">{{ s.service }}</span></td>
+          <td>
+            <span class="pkg-badge pkg-{{ s.package | lower }}">{{ s.package }}</span>
+            <div style="font-size:11px; color:var(--muted); margin-top:3px;">{{ s.budget_display }}</div>
+          </td>
+          <td style="font-size:13px;">{{ s.event_date }}</td>
+          <td style="font-size:11px; color:var(--muted);">{{ s.submitted_at }}</td>
+          <td>
+            <a href="{{ url_for('admin_submission_detail', submission_id=s.id) }}" class="view-btn">
+              View Brief →
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <div class="empty-icon">📭</div>
+    <h2>No submissions yet</h2>
+    <p>Client inquiries will appear here once the form is submitted.</p>
+  </div>
+  {% endif %}
+</main>
+
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UwemMedia — You're In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --bg: #050508;
+      --surface: rgba(12, 12, 18, 0.85);
+      --border: rgba(201,168,76,0.15);
+      --text: #f5f0e8;
+      --muted: rgba(245,240,232,0.4);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Video background */
+    .video-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: #050508;
+    }
+
+    .video-blur {
+      position: absolute;
+      inset: -60px;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 1.4s ease;
+    }
+    .video-blur video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(32px) brightness(0.15) saturate(0.5);
+      transform: scale(1.12);
+    }
+    .video-blur.loaded { opacity: 1; }
+
+    .video-main {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1.4s ease 0.15s;
+    }
+    .video-main video {
+      height: 100%;
+      width: auto;
+      object-fit: contain;
+    }
+    .video-main.loaded { opacity: 1; }
+
+    .video-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background:
+        linear-gradient(to right,
+          rgba(5,5,8,0.97) 0%,
+          rgba(5,5,8,0.7) 30%,
+          rgba(5,5,8,0.7) 70%,
+          rgba(5,5,8,0.97) 100%),
+        linear-gradient(to bottom,
+          rgba(5,5,8,0.7) 0%,
+          rgba(5,5,8,0.4) 20%,
+          rgba(5,5,8,0.4) 80%,
+          rgba(5,5,8,0.95) 100%);
+    }
+
+    /* Grain */
+    .grain {
+      position: fixed;
+      inset: -200%;
+      width: 400%;
+      height: 400%;
+      z-index: 3;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      animation: grain 0.5s steps(2) infinite;
+    }
+    @keyframes grain {
+      0%, 100% { transform: translate(0,0); }
+      25%       { transform: translate(-1%,1%); }
+      50%       { transform: translate(1%,-1%); }
+      75%       { transform: translate(-1%,-1%); }
+    }
+
+    /* Page */
+    .page {
+      position: relative;
+      z-index: 4;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+
+    /* Logo */
+    .logo {
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.1s forwards;
+    }
+    .logo img {
+      height: 40px;
+      filter: brightness(0) invert(1);
+      opacity: 0.85;
+    }
+
+    /* Confirmation card */
+    .card {
+      width: 100%;
+      max-width: 580px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 52px 48px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      text-align: center;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.25s forwards;
+    }
+
+    .check-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      opacity: 0;
+      animation: ringPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+    }
+
+    @keyframes ringPop {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .check-ring svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--gold);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
+      animation: drawCheck 0.5s ease 1.1s forwards;
+    }
+
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    .card-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    .card-headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px;
+      letter-spacing: 2px;
+      line-height: 0.95;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .card-headline em {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      color: var(--gold-light);
+      font-size: 1.05em;
+    }
+
+    .card-sub {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-top: 16px;
+      margin-bottom: 36px;
+    }
+
+    .card-sub strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* Divider */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+    }
+
+    /* Download button */
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      color: var(--gold-light);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      transition: color 0.35s ease;
+      margin-bottom: 12px;
+    }
+
+    .download-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--gold);
+      transform: translateX(-101%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 0;
+    }
+    .download-btn:hover::before { transform: translateX(0); }
+    .download-btn:hover { color: #050508; }
+    .download-btn span, .download-btn svg { position: relative; z-index: 1; }
+
+    .btn-hint {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+    }
+
+    /* Calendly section */
+    .calendly-section {
+      width: 100%;
+      max-width: 780px;
+      margin-top: 40px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.5s forwards;
+    }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+
+    .section-label-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 120px;
+    }
+
+    .section-label-text {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .calendly-wrap {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+    }
+
+    .calendly-wrap iframe {
+      width: 100%;
+      height: 620px;
+      border: none;
+      display: block;
+    }
+
+    .no-calendly {
+      text-align: center;
+      padding: 40px 24px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.7s forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .card { padding: 36px 24px; }
+      .card-headline { font-size: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grain"></div>
+
+  <!-- Video Background -->
+  <div class="video-wrap">
+    <div class="video-blur" id="videoBlur">
+      <video autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
+      </video>
+    </div>
+    <div class="video-main" id="videoMain">
+      <video autoplay muted loop playsinline id="bgVideo">
+        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- Logo -->
+    <div class="logo">
+      <img src="{{ url_for('static', filename='Uwem_Logo.png') }}" alt="UwemMedia">
+    </div>
+
+    <!-- Confirmation Card -->
+    <div class="card">
+      <div class="check-ring">
+        <svg viewBox="0 0 24 24">
+          <polyline points="4 12 9 17 20 6"/>
+        </svg>
+      </div>
+
+      <div class="card-eyebrow">Submission Received</div>
+
+      <h1 class="card-headline">
+        We Got<br>You, <em>{{ name }}</em>
+      </h1>
+
+      <p class="card-sub">
+        Your inquiry is in. Your contract has been generated — sign it and send it to
+        <strong>UwemFilms@gmail.com</strong> before your event date to lock in your booking.
+      </p>
+
+      <a href="{{ url_for('download_contract', client_name=name) }}" class="download-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>Download Contract</span>
+      </a>
+      <div class="btn-hint">PDF · Sign & return via email</div>
+    </div>
+
+    <!-- Calendly -->
+    <div class="calendly-section">
+      <div class="section-label">
+        <div class="section-label-line"></div>
+        <span class="section-label-text">Lock In Your Consultation</span>
+        <div class="section-label-line"></div>
+      </div>
+
+      {% if calendly_url %}
+      <div class="calendly-wrap">
+        <iframe src="{{ calendly_url }}" allowfullscreen></iframe>
+      </div>
+      {% else %}
+      <div class="calendly-wrap">
+        <div class="no-calendly">Calendly unavailable — contact us directly to schedule.</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="footer">© UwemMedia · All rights reserved</div>
+
+  </div>
+
+  <script>
+    const bgVideo = document.getElementById('bgVideo');
+    const videoMain = document.getElementById('videoMain');
+    const videoBlur = document.getElementById('videoBlur');
+
+    function revealVideo() {
+      videoMain.classList.add('loaded');
+      videoBlur.classList.add('loaded');
+    }
+
+    bgVideo.addEventListener('canplaythrough', revealVideo);
+    if (bgVideo.readyState >= 3) revealVideo();
+  </script>
+
+</body>
+</html>
