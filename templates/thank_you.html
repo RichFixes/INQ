@@ -55,18 +55,8 @@
       position: absolute;
       inset: 0;
       z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 1.4s ease 0.15s;
+      overflow: hidden;
     }
-    .video-main video {
-      height: 100%;
-      width: auto;
-      object-fit: contain;
-    }
-    .video-main.loaded { opacity: 1; }
 
     .video-wrap::after {
       content: '';
@@ -345,17 +335,15 @@
 
   <div class="grain"></div>
 
-  <!-- Video Background -->
+  <!-- Video Background: YouTube embed -->
   <div class="video-wrap">
-    <div class="video-blur" id="videoBlur">
-      <video autoplay muted loop playsinline>
-        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
-      </video>
-    </div>
-    <div class="video-main" id="videoMain">
-      <video autoplay muted loop playsinline id="bgVideo">
-        <source src="{{ url_for('static', filename='hero.mp4') }}" type="video/mp4">
-      </video>
+    <div class="video-main" id="videoMain" style="opacity:1;">
+      <iframe
+        src="https://www.youtube.com/embed/oH-34Ebztzg?autoplay=1&mute=1&loop=1&playlist=oH-34Ebztzg&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+        style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100vw; height:56.25vw; min-height:100vh; min-width:177.78vh; border:none; pointer-events:none;"
+        allow="autoplay; encrypted-media"
+        allowfullscreen>
+      </iframe>
     </div>
   </div>
 
@@ -418,17 +406,7 @@
   </div>
 
   <script>
-    const bgVideo = document.getElementById('bgVideo');
-    const videoMain = document.getElementById('videoMain');
-    const videoBlur = document.getElementById('videoBlur');
-
-    function revealVideo() {
-      videoMain.classList.add('loaded');
-      videoBlur.classList.add('loaded');
-    }
-
-    bgVideo.addEventListener('canplaythrough', revealVideo);
-    if (bgVideo.readyState >= 3) revealVideo();
+    // No video JS needed - YouTube iframe handles autoplay and looping
   </script>
 
 </body>
