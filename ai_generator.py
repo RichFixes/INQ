@@ -55,6 +55,27 @@ QUESTIONS FOR CLIENT
 - [Question 2]
 - [Question 3]
 
+VISUAL REFERENCES & MOOD BOARD IDEAS
+Film/Director References:
+- [Reference 1: film or director name and why it applies]
+- [Reference 2: film or director name and why it applies]
+
+Photographer/Visual Artist References:
+- [Reference 1: name and style description]
+- [Reference 2: name and style description]
+
+Color Story:
+- [Describe the dominant colors, contrast levels, and why they fit this project]
+
+Lighting Style:
+- [Describe the lighting approach: natural, dramatic, golden hour, neon, etc.]
+
+Camera Movement Style:
+- [Describe movement: handheld energy, smooth gimbal, locked-off elegance, drone establishing shots, etc.]
+
+Era/Aesthetic Touchstone:
+- [Describe a specific era, subculture, or aesthetic that captures the visual world of this project]
+
 ================================"""
 
     user_message = f"""Client Name: {client_name or 'Not provided'}
@@ -71,7 +92,7 @@ Project Details: {details}"""
             },
             json={
                 "model": "claude-haiku-4-5-20251001",
-                "max_tokens": 1000,
+                "max_tokens": 1500,
                 "system": system_prompt,
                 "messages": [{"role": "user", "content": user_message}]
             },

@@ -375,6 +375,33 @@
     {% endif %}
   </div>
 
+  <!-- Visual References -->
+  {% if 'VISUAL REFERENCES' in brief.upper() %}
+  <div class="card-full">
+    <div class="card-label">🎨 Visual References & Mood Board Ideas</div>
+    {% set lines = brief.split('\n') %}
+    {% set in_section = namespace(val=false) %}
+    {% set current_sub = namespace(val='') %}
+    {% for line in lines %}
+      {% if 'VISUAL REFERENCES' in line.upper() %}
+        {% set in_section.val = true %}
+      {% elif in_section.val and line.strip().startswith('===') %}
+        {% set in_section.val = false %}
+      {% elif in_section.val %}
+        {% if line.strip().endswith(':') and not line.strip().startswith('-') %}
+          {% set current_sub.val = line.strip() %}
+          <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin:16px 0 8px;">{{ line.strip().rstrip(':') }}</div>
+        {% elif line.strip().startswith('-') %}
+          <div style="display:flex; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; color:#c0c0d0;">
+            <span style="color:var(--gold); flex-shrink:0;">▸</span>
+            <span>{{ line.strip().lstrip('-').strip() }}</span>
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <!-- Full raw brief -->
   <div class="card-full">
     <div class="card-label">📄 Full AI Creative Brief</div>
