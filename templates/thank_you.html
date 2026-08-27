@@ -384,23 +384,26 @@
       </a>
       <div class="btn-hint">Bookmark this link · Return anytime to pay deposit</div>
 
-    <!-- Calendly -->
+        <!-- Next Steps -->
     <div class="calendly-section">
       <div class="section-label">
         <div class="section-label-line"></div>
-        <span class="section-label-text">Lock In Your Consultation</span>
+        <span class="section-label-text">What Happens Next</span>
         <div class="section-label-line"></div>
       </div>
-
-      {% if calendly_url %}
       <div class="calendly-wrap">
-        <iframe src="{{ calendly_url }}" allowfullscreen></iframe>
+        <div class="no-calendly" style="padding: 48px 32px; line-height: 2;">
+          <p style="font-size:15px; color: var(--text); margin-bottom: 16px;">
+            Your INQ Spot is being reviewed.
+          </p>
+          <p style="font-size: 13px;">
+            We'll reach out to <strong>{{ name }}</strong> within 24 hours to schedule your consultation and confirm your shoot date.
+          </p>
+          <p style="font-size: 12px; margin-top: 20px; color: var(--muted);">
+            In the meantime — bookmark your INQ status link above to pay your deposit when you're ready.
+          </p>
+        </div>
       </div>
-      {% else %}
-      <div class="calendly-wrap">
-        <div class="no-calendly">Calendly unavailable — contact us directly to schedule.</div>
-      </div>
-      {% endif %}
     </div>
 
     <div class="footer">© UwemMedia · All rights reserved</div>

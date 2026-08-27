@@ -108,7 +108,6 @@ def submit():
     return render_template(
         "thank_you.html",
         name=name,
-        calendly_url=os.getenv("CALENDLY_URL"),
         pdf_path=pdf_path,
         token=entry.token
     )
@@ -130,6 +129,57 @@ def inquiry_status(token):
         return render_template("404.html"), 404
     return render_template("inquiry_status.html", s=inquiry)
 
+import stripe
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+
+@app.route("/checkout/<token>")
+def checkout(token):
+    from models import Inquiry
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return "Inquiry not found.", 404
+
+    # Calculate 30% deposit
+    package_amounts = {
+        "Basic": 150, "Standard": 300, "Premium": 600, "Custom": 0
+    }
+    base_amount = package_amounts.get(inquiry.package, 0)
+    deposit_amount = int(base_amount * 0.30 * 100)  # Stripe uses cents
+
+    if deposit_amount == 0:
+        flash("Custom quote — contact us to arrange payment.")
+        return redirect(url_for("inquiry_status", token=token))
+
+    session = stripe.checkout.Session.create(
+        payment_method_types=["card"],
+        line_items=[{
+            "price_data": {
+                "currency": "usd",
+                "product_data": {
+                    "name": f"UwemMedia Deposit — {inquiry.service}",
+                    "description": f"{inquiry.package} package · 30% deposit"
+                },
+                "unit_amount": deposit_amount,
+            },
+            "quantity": 1,
+        }],
+        mode="payment",
+        success_url=url_for("checkout_success", token=token, _external=True),
+        cancel_url=url_for("inquiry_status", token=token, _external=True),
+        metadata={"token": token}
+    )
+    return redirect(session.url, code=303)
+
+
+@app.route("/checkout/success/<token>")
+def checkout_success(token):
+    from models import Inquiry
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if inquiry:
+        inquiry.deposit_paid = True
+        inquiry.stage = "deposit_paid"
+        db.session.commit()
+    return render_template("deposit_success.html", s=inquiry)
 @app.route("/schedule", methods=["GET", "POST"])
 def schedule():
     if request.method == "POST":
