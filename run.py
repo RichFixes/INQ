@@ -22,6 +22,19 @@ PRICING = {
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
 
+ # Database
+from models import db
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inq.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
+
+@app.before_request
+def create_tables():
+    db.create_all()
+
+# with app.app_context():
+#     db.create_all()
+
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "uwemmedia2024")
 
 

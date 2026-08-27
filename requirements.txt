@@ -1,7 +1,9 @@
-reportlab
-python-dotenv
-gunicorn==23.0.0
-requests
-pillow
 Flask>=2.0
+gunicorn==23.0.0
+python-dotenv
+requests
+reportlab
+pillow
 pytest
+flask-sqlalchemy==3.1.1
+stripe

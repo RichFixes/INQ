@@ -12,3 +12,4 @@ submissions.json
 *.mp4
 *.mov
 *.MP4
+venv/
