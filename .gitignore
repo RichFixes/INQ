@@ -13,3 +13,4 @@ submissions.json
 *.mov
 *.MP4
 venv/
+instance/
