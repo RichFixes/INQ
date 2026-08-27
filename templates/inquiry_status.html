@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your INQ — {{ s.name }}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uwem_Logo.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #222230;
+      --accent: #e8ff47;
+      --text: #f0f0f0;
+      --muted: #55556a;
+      --green: #47ffb2;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 560px;
+      width: 100%;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+    .client-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 4px;
+    }
+    .service {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 32px;
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .status-row:last-of-type { border-bottom: none; }
+    .status-label { color: var(--muted); }
+    .status-val { font-weight: 500; }
+    .done { color: var(--green); }
+    .pending { color: var(--accent); }
+    .stage-badge {
+      display: inline-block;
+      margin-top: 24px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 16px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+    .pay-btn {
+      display: block;
+      margin-top: 28px;
+      background: var(--accent);
+      color: #0a0a0f;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+      padding: 14px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .pay-btn:hover { opacity: 0.85; }
+    .paid-notice {
+      margin-top: 28px;
+      text-align: center;
+      color: var(--green);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">UwemMedia · INQ</div>
+    <div class="client-name">{{ s.name }}</div>
+    <div class="service">{{ s.service }} · {{ s.package }} · {{ s.budget_display }}</div>
+
+    <div class="status-row">
+      <span class="status-label">Inquiry Submitted</span>
+      <span class="status-val done">✓ Complete</span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Contract Signed</span>
+      <span class="status-val {{ 'done' if s.contract_signed else 'pending' }}">
+        {{ '✓ Signed' if s.contract_signed else '— Pending' }}
+      </span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Deposit Paid</span>
+      <span class="status-val {{ 'done' if s.deposit_paid else 'pending' }}">
+        {{ '✓ Paid' if s.deposit_paid else '— Pending' }}
+      </span>
+    </div>
+    <div class="status-row">
+      <span class="status-label">Shoot Date</span>
+      <span class="status-val">{{ s.shoot_date or '— TBD' }}</span>
+    </div>
+
+    <div class="stage-badge">{{ s.stage | replace('_', ' ') | title }}</div>
+
+    {% if not s.deposit_paid %}
+    <a href="#" class="pay-btn">Pay Deposit Now →</a>
+    {% else %}
+    <div class="paid-notice">✓ Deposit received — you're confirmed.</div>
+    {% endif %}
+  </div>
+</body>
+</html>

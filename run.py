@@ -92,7 +92,7 @@ def submit():
     pdf_path = generate_contract(name, service, date, budget, budget_display, details, package)
 
     # 5. Save submission to log
-    save_submission(
+    entry = save_submission(
         name=name,
         email=email,
         service=service,
@@ -109,7 +109,8 @@ def submit():
         "thank_you.html",
         name=name,
         calendly_url=os.getenv("CALENDLY_URL"),
-        pdf_path=pdf_path
+        pdf_path=pdf_path,
+        token=entry.token
     )
 
 
@@ -121,6 +122,13 @@ def download_contract(client_name):
         return f"Contract for {client_name} not found.", 404
     return send_file(filepath, as_attachment=True)
 
+@app.route("/inquiry/<token>")
+def inquiry_status(token):
+    from models import Inquiry
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return render_template("404.html"), 404
+    return render_template("inquiry_status.html", s=inquiry)
 
 @app.route("/schedule", methods=["GET", "POST"])
 def schedule():
