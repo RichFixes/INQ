@@ -136,7 +136,13 @@
     <div class="stage-badge">{{ s.stage | replace('_', ' ') | title }}</div>
 
     {% if not s.deposit_paid %}
-    <a href="#" class="pay-btn">Pay Deposit Now →</a>
+      {% if custom_quote is defined and custom_quote %}
+      <div class="paid-notice" style="color: var(--muted);">
+        Custom quote — we'll send your deposit amount directly.
+      </div>
+      {% else %}
+      <a href="{{ url_for('checkout', token=s.token) }}" class="pay-btn">Pay Deposit Now →</a>
+      {% endif %}
     {% else %}
     <div class="paid-notice">✓ Deposit received — you're confirmed.</div>
     {% endif %}

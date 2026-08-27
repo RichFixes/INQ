@@ -130,10 +130,10 @@ def inquiry_status(token):
     return render_template("inquiry_status.html", s=inquiry)
 
 import stripe
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 @app.route("/checkout/<token>")
 def checkout(token):
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
     from models import Inquiry
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
@@ -147,9 +147,10 @@ def checkout(token):
     deposit_amount = int(base_amount * 0.30 * 100)  # Stripe uses cents
 
     if deposit_amount == 0:
-        flash("Custom quote — contact us to arrange payment.")
-        return redirect(url_for("inquiry_status", token=token))
-
+        return render_template("inquiry_status.html", 
+            s=Inquiry.query.filter_by(token=token).first(),
+            custom_quote=True)
+    
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[{

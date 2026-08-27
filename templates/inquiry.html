@@ -437,6 +437,111 @@
 
       .field-row { grid-template-columns: 1fr; gap: 18px; }
     }
+
+        /* Package info modal */
+    .info-icon {
+      display: inline-block;
+      margin-left: 8px;
+      color: var(--gold);
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+      vertical-align: middle;
+    }
+    .info-icon:hover { opacity: 1; }
+
+    .pkg-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5,5,8,0.85);
+      backdrop-filter: blur(8px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .pkg-modal.open { display: flex; }
+
+    .pkg-modal-inner {
+      background: #0e0e18;
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 14px;
+      padding: 28px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .pkg-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    .pkg-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+    .pkg-close:hover { color: var(--text); }
+
+    .pkg-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .pkg-table th {
+      text-align: center;
+      padding: 8px 10px;
+      color: var(--gold);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(201,168,76,0.15);
+    }
+
+    .pkg-table th:first-child { text-align: left; }
+
+    .pkg-table td {
+      padding: 10px;
+      text-align: center;
+      color: rgba(245,240,232,0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .pkg-row-label {
+      text-align: left !important;
+      color: var(--muted) !important;
+      font-size: 10px !important;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .pkg-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      border-left: 2px solid var(--gold);
+      padding-left: 14px;
+    }
+    .pkg-note strong { color: var(--gold-light); }
   </style>
 </head>
 <body>
@@ -540,8 +645,11 @@
               <label for="date">Event Date</label>
               <input type="date" id="date" name="date" required>
             </div>
-            <div class="field">
-              <label for="package">Package</label>
+                        <div class="field">
+              <label for="package">
+                Package
+                <span class="info-icon" onclick="togglePackageInfo()" title="View package details">ⓘ</span>
+              </label>
               <select id="package" name="package" required>
                 <option value="" disabled selected>Select package</option>
                 <option value="basic">Basic — $100–250</option>
@@ -549,8 +657,73 @@
                 <option value="premium">Premium — $600+</option>
                 <option value="custom">Custom Quote</option>
               </select>
+
+              <!-- Package info modal -->
+              <div class="pkg-modal" id="pkgModal">
+                <div class="pkg-modal-inner">
+                  <div class="pkg-modal-header">
+                    <span>Package Guide</span>
+                    <button onclick="togglePackageInfo()" class="pkg-close">✕</button>
+                  </div>
+                  <table class="pkg-table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Basic</th>
+                        <th>Standard</th>
+                        <th>Premium</th>
+                        <th>Custom</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="pkg-row-label">Price</td>
+                        <td>$100–250</td>
+                        <td>$300–500</td>
+                        <td>$600+</td>
+                        <td>Quote</td>
+                      </tr>
+                      <tr>
+                        <td class="pkg-row-label">Duration</td>
+                        <td>Up to 2 hrs</td>
+                        <td>2–4 hrs</td>
+                        <td>4–8 hrs</td>
+                        <td>Flexible</td>
+                      </tr>
+                      <tr>
+                        <td class="pkg-row-label">Locations</td>
+                        <td>1</td>
+                        <td>Up to 2</td>
+                        <td>Up to 3</td>
+                        <td>Unlimited</td>
+                      </tr>
+                      <tr>
+                        <td class="pkg-row-label">Revisions</td>
+                        <td>1 round</td>
+                        <td>2 rounds</td>
+                        <td>3 rounds</td>
+                        <td>Unlimited</td>
+                      </tr>
+                      <tr>
+                        <td class="pkg-row-label">Turnaround</td>
+                        <td>2 weeks</td>
+                        <td>2 weeks</td>
+                        <td>2 weeks</td>
+                        <td>Negotiated</td>
+                      </tr>
+                      <tr>
+                        <td class="pkg-row-label">Best for</td>
+                        <td>Reels & content clips</td>
+                        <td>Events & short films</td>
+                        <td>Music videos & brand films</td>
+                        <td>Podcasts & full productions</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="pkg-note">🎙 Podcast or interview project? We recommend <strong>Custom</strong> — let's talk through your setup, episode format, and ongoing needs.</p>
+                </div>
+              </div>
             </div>
-          </div>
 
           <div class="field">
             <label for="details">Tell Us Your Vision</label>
@@ -584,6 +757,16 @@
     function handleDetails(el) {
       document.getElementById('charCount').textContent = el.value.length;
     }
+
+    function togglePackageInfo() {
+      const modal = document.getElementById('pkgModal');
+      modal.classList.toggle('open');
+    }
+
+    // Close on outside click
+    document.getElementById('pkgModal').addEventListener('click', function(e) {
+      if (e.target === this) togglePackageInfo();
+    });
   </script>
 
 </body>

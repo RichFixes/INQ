@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deposit Confirmed — UwemMedia</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uwem_Logo.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #222230;
+      --accent: #e8ff47;
+      --text: #f0f0f0;
+      --muted: #55556a;
+      --green: #47ffb2;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .check {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1.5px solid var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+    }
+    .check svg {
+      width: 24px; height: 24px;
+      stroke: var(--green);
+      stroke-width: 2;
+      fill: none;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+    }
+    p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+    .back-btn {
+      display: inline-block;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      padding: 10px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="check">
+      <svg viewBox="0 0 24 24"><polyline points="4 12 9 17 20 6"/></svg>
+    </div>
+    <h1>Deposit Confirmed</h1>
+    <p>
+      Your deposit for <strong>{{ s.service }}</strong> has been received.
+      You're locked in — we'll be in touch to confirm your shoot date.
+    </p>
+    <a href="{{ url_for('inquiry_status', token=s.token) }}" class="back-btn">
+      View Your INQ Status →
+    </a>
+  </div>
+</body>
+</html>
