@@ -143,7 +143,10 @@ def sign_contract(token):
 def submit_signature(token):
     from models import Inquiry
     import base64
-    from weasyprint import HTML
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib.units import inch
+    from io import BytesIO
 
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
@@ -154,15 +157,136 @@ def submit_signature(token):
         flash("Signature is required.")
         return redirect(url_for("sign_contract", token=token))
 
-    # Save signed contract as PDF
-    os.makedirs("contracts", exist_ok=True)
-    signed_path = f"contracts/{inquiry.name.replace(' ', '_')}_signed.pdf"
+    # Decode signature image
+    sig_bytes = base64.b64decode(signature_data.split(",")[1])
 
-    html_content = render_template("contract_pdf.html",
-        s=inquiry,
-        signature_data=signature_data
-    )
-    HTML(string=html_content).write_pdf(signed_path)
+    # Save signature as temp PNG
+    os.makedirs("contracts", exist_ok=True)
+    sig_path = f"contracts/{inquiry.name.replace(' ', '_')}_sig.png"
+    with open(sig_path, "wb") as f:
+        f.write(sig_bytes)
+
+    # Generate signed PDF with ReportLab
+    signed_path = f"contracts/{inquiry.name.replace(' ', '_')}_signed.pdf"
+    c = canvas.Canvas(signed_path, pagesize=letter)
+    w, h = letter
+
+    # Header
+    c.setFont("Helvetica-Bold", 18)
+    c.drawString(1*inch, h - 1*inch, "UwemMedia Service Agreement")
+    c.setFont("Helvetica", 10)
+    c.setFillColorRGB(0.4, 0.4, 0.4)
+    c.drawString(1*inch, h - 1.3*inch, f"Generated {inquiry.submitted_at}")
+
+    # Section helper
+    def section(title, y):
+        c.setFont("Helvetica-Bold", 11)
+        c.setFillColorRGB(0.1, 0.1, 0.1)
+        c.drawString(1*inch, y, title)
+        c.setLineWidth(0.5)
+        c.setStrokeColorRGB(0.8, 0.8, 0.8)
+        c.line(1*inch, y - 4, 7.5*inch, y - 4)
+        return y - 20
+
+    def field(label, value, y):
+        c.setFont("Helvetica-Bold", 9)
+        c.setFillColorRGB(0.5, 0.5, 0.5)
+        c.drawString(1*inch, y, label + ":")
+        c.setFont("Helvetica", 9)
+        c.setFillColorRGB(0.1, 0.1, 0.1)
+        c.drawString(2.5*inch, y, str(value))
+        return y - 16
+
+    def body(text, y):
+        c.setFont("Helvetica", 9)
+        c.setFillColorRGB(0.2, 0.2, 0.2)
+        # Simple word wrap
+        words = text.split()
+        line = ""
+        for word in words:
+            if c.stringWidth(line + " " + word, "Helvetica", 9) < 5.5*inch:
+                line += " " + word
+            else:
+                c.drawString(1*inch, y, line.strip())
+                y -= 14
+                line = word
+        if line:
+            c.drawString(1*inch, y, line.strip())
+            y -= 14
+        return y - 6
+
+    y = h - 1.6*inch
+    y = section("Client & Project Details", y)
+    y = field("Client", inquiry.name, y)
+    y = field("Email", inquiry.email, y)
+    y = field("Service", inquiry.service, y)
+    y = field("Package", inquiry.package, y)
+    y = field("Event Date", inquiry.event_date, y)
+    y = field("Budget Range", inquiry.budget_display, y)
+
+    y -= 10
+    y = section("Project Description", y)
+    y = body(inquiry.details, y)
+
+    y -= 6
+    y = section("Scope of Services", y)
+    for item in [
+        "30-minute pre-production consultation",
+        "Filming per package duration",
+        "Professional editing with revisions per package tier",
+        "Final delivery in MP4 format within 2 weeks of shoot date"
+    ]:
+        c.setFont("Helvetica", 9)
+        c.setFillColorRGB(0.2, 0.2, 0.2)
+        c.drawString(1.1*inch, y, f"• {item}")
+        y -= 14
+    y -= 6
+
+    y = section("Payment Terms", y)
+    y = body("A 30% deposit is due upon signing to confirm your booking. Remaining balance due on delivery. Cancellations within 5 days forfeit the deposit.", y)
+
+    y -= 6
+    y = section("Rights & Responsibilities", y)
+    for item in [
+        "UwemMedia retains copyright to all raw footage.",
+        "Client is granted rights for personal and promotional use.",
+        "Client must provide necessary access and permissions.",
+        "UwemMedia is not liable for circumstances beyond control."
+    ]:
+        c.setFont("Helvetica", 9)
+        c.setFillColorRGB(0.2, 0.2, 0.2)
+        c.drawString(1.1*inch, y, f"• {item}")
+        y -= 14
+    y -= 16
+
+    # Signature
+    y = section("Client Signature", y)
+    y -= 8
+    try:
+        c.drawImage(sig_path, 1*inch, y - 60, width=200, height=60,
+                   preserveAspectRatio=True, mask='auto')
+    except Exception:
+        c.drawString(1*inch, y - 30, "[Signature on file]")
+    y -= 70
+    c.setFont("Helvetica", 9)
+    c.setFillColorRGB(0.4, 0.4, 0.4)
+    c.drawString(1*inch, y, f"{inquiry.name} — digitally signed")
+    y -= 12
+    c.drawString(1*inch, y, f"Date: {inquiry.submitted_at}")
+
+    # Footer
+    c.setFont("Helvetica", 8)
+    c.setFillColorRGB(0.6, 0.6, 0.6)
+    c.drawString(1*inch, 0.5*inch,
+        "UwemMedia · uwem.art · This document constitutes a binding service agreement.")
+
+    c.save()
+
+    # Clean up temp sig file
+    try:
+        os.remove(sig_path)
+    except Exception:
+        pass
 
     # Update DB
     inquiry.contract_signed = True
