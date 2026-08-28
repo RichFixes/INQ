@@ -181,35 +181,65 @@ def checkout(token):
     if not inquiry:
         return "Inquiry not found.", 404
 
-    # Calculate 30% deposit
     package_amounts = {
         "Basic": 150, "Standard": 300, "Premium": 600, "Custom": 0
     }
     base_amount = package_amounts.get(inquiry.package, 0)
-    deposit_amount = int(base_amount * 0.30 * 100)  # Stripe uses cents
 
-    if deposit_amount == 0:
-        return render_template("inquiry_status.html", 
-            s=Inquiry.query.filter_by(token=token).first(),
-            custom_quote=True)
-    
+    if base_amount == 0:
+        return render_template("inquiry_status.html",
+            s=inquiry, custom_quote=True)
+
+    deposit_amount = int(base_amount * 0.30 * 100)
+    full_amount = int(base_amount * 100)
+
+    return render_template("payment_choice.html",
+        s=inquiry,
+        deposit_amount=deposit_amount,
+        full_amount=full_amount,
+        deposit_display=f"${base_amount * 0.30:,.0f}",
+        full_display=f"${base_amount:,}"
+    )
+
+
+@app.route("/checkout/<token>/pay/<payment_type>")
+def checkout_pay(token, payment_type):
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    from models import Inquiry
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return "Inquiry not found.", 404
+
+    package_amounts = {
+        "Basic": 150, "Standard": 300, "Premium": 600, "Custom": 0
+    }
+    base_amount = package_amounts.get(inquiry.package, 0)
+
+    if payment_type == "deposit":
+        amount = int(base_amount * 0.30 * 100)
+        label = "30% Deposit"
+    else:
+        amount = int(base_amount * 100)
+        label = "Full Payment"
+
     session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[{
             "price_data": {
                 "currency": "usd",
                 "product_data": {
-                    "name": f"UwemMedia Deposit — {inquiry.service}",
-                    "description": f"{inquiry.package} package · 30% deposit"
+                    "name": f"UwemMedia — {inquiry.service}",
+                    "description": f"{inquiry.package} package · {label}"
                 },
-                "unit_amount": deposit_amount,
+                "unit_amount": amount,
             },
             "quantity": 1,
         }],
         mode="payment",
-        success_url=url_for("checkout_success", token=token, _external=True),
+        success_url=url_for("checkout_success", token=token,
+            payment_type=payment_type, _external=True),
         cancel_url=url_for("inquiry_status", token=token, _external=True),
-        metadata={"token": token}
+        metadata={"token": token, "payment_type": payment_type}
     )
     return redirect(session.url, code=303)
 
@@ -217,21 +247,17 @@ def checkout(token):
 @app.route("/checkout/success/<token>")
 def checkout_success(token):
     from models import Inquiry
+    payment_type = request.args.get("payment_type", "deposit")
     inquiry = Inquiry.query.filter_by(token=token).first()
     if inquiry:
         inquiry.deposit_paid = True
-        inquiry.stage = "deposit_paid"
+        if payment_type == "full":
+            inquiry.stage = "shoot_scheduled"
+        else:
+            inquiry.stage = "deposit_paid"
         db.session.commit()
-    return render_template("deposit_success.html", s=inquiry)
-@app.route("/schedule", methods=["GET", "POST"])
-def schedule():
-    if request.method == "POST":
-        time_slot = request.form.get("time_slot")
-        contact   = request.form.get("contact_method")
-        print(f"Booking: {time_slot}, via {contact}")
-        flash("Your consultation request has been received!")
-        return redirect(url_for("index"))
-    return render_template("schedule.html")
+    return render_template("deposit_success.html", s=inquiry,
+        payment_type=payment_type)
 
 
 # ─── Admin Routes ─────────────────────────────────────────────────────────────

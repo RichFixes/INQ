@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment — UwemMedia</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uwem_Logo.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #222230;
+      --accent: #e8ff47;
+      --text: #f0f0f0;
+      --muted: #55556a;
+      --green: #47ffb2;
+      --gold: #c9a84c;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .wrap { max-width: 480px; width: 100%; }
+    .logo-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    }
+    .logo-row img { height: 36px; filter: brightness(0) invert(1); opacity: 0.85; }
+    .logo-row span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 14px; }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+    .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 32px; }
+
+    .option-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+      text-decoration: none;
+      display: block;
+    }
+    .option-card:hover { border-color: var(--accent); }
+    .option-card.featured { border-color: var(--accent); }
+
+    .option-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .option-card.secondary .option-tag { color: var(--muted); }
+
+    .option-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .option-desc { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+
+    .option-btn {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      background: var(--accent);
+      color: #0a0a0f;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .option-btn:hover { opacity: 0.85; }
+    .option-card.secondary .option-btn {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .option-card.secondary .option-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .saving {
+      display: inline-block;
+      background: rgba(71,255,178,0.15);
+      color: var(--green);
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 99px;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo-row">
+      <img src="{{ url_for('static', filename='Uwem_Logo.png') }}" alt="UwemMedia">
+      <span>UwemMedia</span>
+    </div>
+
+    <h1>Choose Payment</h1>
+    <p class="subtitle">{{ s.service }} · {{ s.package }} package</p>
+
+    <!-- Full payment -->
+    <a href="{{ url_for('checkout_pay', token=s.token, payment_type='full') }}" class="option-card featured">
+      <div class="saving">Best Value</div>
+      <div class="option-tag">Pay in Full</div>
+      <div class="option-amount">{{ full_display }}</div>
+      <div class="option-desc">
+        Pay the full package amount upfront. No balance due on delivery — 
+        you're completely covered from shoot to final delivery.
+      </div>
+      <span class="option-btn">Pay {{ full_display }} Now →</span>
+    </a>
+
+    <!-- Deposit -->
+    <a href="{{ url_for('checkout_pay', token=s.token, payment_type='deposit') }}" class="option-card secondary">
+      <div class="option-tag">30% Deposit to Confirm</div>
+      <div class="option-amount">{{ deposit_display }}</div>
+      <div class="option-desc">
+        Pay a 30% deposit now to lock in your booking. 
+        The remaining balance of {{ full_display }} is due on delivery.
+      </div>
+      <span class="option-btn">Pay {{ deposit_display }} Deposit →</span>
+    </a>
+
+    <a href="{{ url_for('inquiry_status', token=s.token) }}" class="back-link">← Back to my INQ</a>
+  </div>
+</body>
+</html>

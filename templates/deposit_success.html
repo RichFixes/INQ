@@ -86,8 +86,13 @@
     </div>
     <h1>Deposit Confirmed</h1>
     <p>
-      Your deposit for <strong>{{ s.service }}</strong> has been received.
-      You're locked in — we'll be in touch to confirm your shoot date.
+      {% if payment_type == 'full' %}
+        Full payment for <strong>{{ s.service }}</strong> has been received.
+        You're fully booked — we'll be in touch to confirm your shoot date.
+      {% else %}
+        Your deposit for <strong>{{ s.service }}</strong> has been received.
+        You're locked in — remaining balance due on delivery.
+      {% endif %}
     </p>
     <a href="{{ url_for('inquiry_status', token=s.token) }}" class="back-btn">
       View Your INQ Status →
