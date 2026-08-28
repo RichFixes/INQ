@@ -1,9 +1,8 @@
 import os
 import re
 from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, session
+from flask import Flask, render_template, request, redirect, url_for, flash, send_file, session, jsonify
 from dotenv import load_dotenv
-
 load_dotenv()
 
 from contract_generator import generate_contract
@@ -11,6 +10,8 @@ from ai_generator import generate_inq_spot
 from inq_spot_generator import generate_inq_spot_pdf
 from submission_log import save_submission, load_submissions, get_submission_by_id
 # from email_utils import send_inq_spot_email  # Uncomment when ready
+
+import stripe
 
 PRICING = {
     "basic":    {"amount": 150, "display": "$100–$250", "label": "Basic"},
@@ -22,7 +23,7 @@ PRICING = {
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
 
- # Database
+# Database
 from models import db
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///inq.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -31,9 +32,6 @@ db.init_app(app)
 @app.before_request
 def create_tables():
     db.create_all()
-
-# with app.app_context():
-#     db.create_all()
 
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "uwemmedia2024")
 
@@ -65,12 +63,10 @@ def submit():
     package = request.form.get("package", "").strip()
     details = request.form.get("details", "").strip()
 
-    # Validate required fields
     if not all([name, email, service, date, details]):
         flash("All fields are required.")
         return redirect(url_for("index"))
 
-    # Validate package
     if package not in PRICING:
         flash("Invalid package selected.")
         return redirect(url_for("index"))
@@ -79,19 +75,10 @@ def submit():
     budget         = package_info["amount"]
     budget_display = package_info["display"]
 
-    # 1. Generate INQ Spot creative brief (Claude AI)
-    ai_text = generate_inq_spot(details, client_name=name, service=service)
-
-    # 2. Create INQ Spot PDF
+    ai_text      = generate_inq_spot(details, client_name=name, service=service)
     inq_pdf_path = generate_inq_spot_pdf(name, ai_text)
+    pdf_path     = generate_contract(name, service, date, budget, budget_display, details, package)
 
-    # 3. Email it (uncomment when email_utils is configured)
-    # send_inq_spot_email(inq_pdf_path)
-
-    # 4. Generate client-facing contract PDF
-    pdf_path = generate_contract(name, service, date, budget, budget_display, details, package)
-
-    # 5. Save submission to log
     entry = save_submission(
         name=name,
         email=email,
@@ -121,6 +108,7 @@ def download_contract(client_name):
         return f"Contract for {client_name} not found.", 404
     return send_file(filepath, as_attachment=True)
 
+
 @app.route("/inquiry/<token>")
 def inquiry_status(token):
     from models import Inquiry
@@ -128,6 +116,8 @@ def inquiry_status(token):
     if not inquiry:
         return render_template("404.html"), 404
     return render_template("inquiry_status.html", s=inquiry)
+
+
 @app.route("/sign/<token>", methods=["GET", "POST"])
 def sign_contract(token):
     from models import Inquiry
@@ -146,7 +136,6 @@ def submit_signature(token):
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import inch
-    from io import BytesIO
 
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
@@ -157,28 +146,24 @@ def submit_signature(token):
         flash("Signature is required.")
         return redirect(url_for("sign_contract", token=token))
 
-    # Decode signature image
     sig_bytes = base64.b64decode(signature_data.split(",")[1])
 
-    # Save signature as temp PNG
     os.makedirs("contracts", exist_ok=True)
-    sig_path = f"contracts/{inquiry.name.replace(' ', '_')}_sig.png"
+    sig_path    = f"contracts/{inquiry.name.replace(' ', '_')}_sig.png"
+    signed_path = f"contracts/{inquiry.name.replace(' ', '_')}_signed.pdf"
+
     with open(sig_path, "wb") as f:
         f.write(sig_bytes)
 
-    # Generate signed PDF with ReportLab
-    signed_path = f"contracts/{inquiry.name.replace(' ', '_')}_signed.pdf"
     c = canvas.Canvas(signed_path, pagesize=letter)
     w, h = letter
 
-    # Header
     c.setFont("Helvetica-Bold", 18)
     c.drawString(1*inch, h - 1*inch, "UwemMedia Service Agreement")
     c.setFont("Helvetica", 10)
     c.setFillColorRGB(0.4, 0.4, 0.4)
     c.drawString(1*inch, h - 1.3*inch, f"Generated {inquiry.submitted_at}")
 
-    # Section helper
     def section(title, y):
         c.setFont("Helvetica-Bold", 11)
         c.setFillColorRGB(0.1, 0.1, 0.1)
@@ -200,7 +185,6 @@ def submit_signature(token):
     def body(text, y):
         c.setFont("Helvetica", 9)
         c.setFillColorRGB(0.2, 0.2, 0.2)
-        # Simple word wrap
         words = text.split()
         line = ""
         for word in words:
@@ -217,11 +201,11 @@ def submit_signature(token):
 
     y = h - 1.6*inch
     y = section("Client & Project Details", y)
-    y = field("Client", inquiry.name, y)
-    y = field("Email", inquiry.email, y)
-    y = field("Service", inquiry.service, y)
-    y = field("Package", inquiry.package, y)
-    y = field("Event Date", inquiry.event_date, y)
+    y = field("Client",       inquiry.name,         y)
+    y = field("Email",        inquiry.email,         y)
+    y = field("Service",      inquiry.service,       y)
+    y = field("Package",      inquiry.package,       y)
+    y = field("Event Date",   inquiry.event_date,    y)
     y = field("Budget Range", inquiry.budget_display, y)
 
     y -= 10
@@ -259,12 +243,11 @@ def submit_signature(token):
         y -= 14
     y -= 16
 
-    # Signature
     y = section("Client Signature", y)
     y -= 8
     try:
         c.drawImage(sig_path, 1*inch, y - 60, width=200, height=60,
-                   preserveAspectRatio=True, mask='auto')
+                    preserveAspectRatio=True, mask='auto')
     except Exception:
         c.drawString(1*inch, y - 30, "[Signature on file]")
     y -= 70
@@ -274,28 +257,25 @@ def submit_signature(token):
     y -= 12
     c.drawString(1*inch, y, f"Date: {inquiry.submitted_at}")
 
-    # Footer
     c.setFont("Helvetica", 8)
     c.setFillColorRGB(0.6, 0.6, 0.6)
     c.drawString(1*inch, 0.5*inch,
         "UwemMedia · uwem.art · This document constitutes a binding service agreement.")
-
     c.save()
 
-    # Clean up temp sig file
     try:
         os.remove(sig_path)
     except Exception:
         pass
 
-    # Update DB
     inquiry.contract_signed = True
-    inquiry.contract_path = signed_path
+    inquiry.contract_path   = signed_path
     db.session.commit()
 
     return redirect(url_for("inquiry_status", token=token))
 
-import stripe
+
+# ─── Stripe / Checkout Routes ─────────────────────────────────────────────────
 
 @app.route("/checkout/<token>")
 def checkout(token):
@@ -311,11 +291,10 @@ def checkout(token):
     base_amount = package_amounts.get(inquiry.package, 0)
 
     if base_amount == 0:
-        return render_template("inquiry_status.html",
-            s=inquiry, custom_quote=True)
+        return render_template("inquiry_status.html", s=inquiry, custom_quote=True)
 
     deposit_amount = int(base_amount * 0.30 * 100)
-    full_amount = int(base_amount * 100)
+    full_amount    = int(base_amount * 100)
 
     return render_template("payment_choice.html",
         s=inquiry,
@@ -341,12 +320,13 @@ def checkout_pay(token, payment_type):
 
     if payment_type == "deposit":
         amount = int(base_amount * 0.30 * 100)
-        label = "30% Deposit"
+        label  = "30% Deposit"
     else:
         amount = int(base_amount * 100)
-        label = "Full Payment"
+        label  = "Full Payment"
 
-    session = stripe.checkout.Session.create(
+    # NOTE: renamed to stripe_session to avoid conflict with Flask session
+    stripe_session = stripe.checkout.Session.create(
         payment_method_types=["card"],
         line_items=[{
             "price_data": {
@@ -365,7 +345,7 @@ def checkout_pay(token, payment_type):
         cancel_url=url_for("inquiry_status", token=token, _external=True),
         metadata={"token": token, "payment_type": payment_type}
     )
-    return redirect(session.url, code=303)
+    return redirect(stripe_session.url, code=303)
 
 
 @app.route("/checkout/success/<token>")
@@ -375,13 +355,9 @@ def checkout_success(token):
     inquiry = Inquiry.query.filter_by(token=token).first()
     if inquiry:
         inquiry.deposit_paid = True
-        if payment_type == "full":
-            inquiry.stage = "shoot_scheduled"
-        else:
-            inquiry.stage = "deposit_paid"
+        inquiry.stage = "shoot_scheduled" if payment_type == "full" else "deposit_paid"
         db.session.commit()
-    return render_template("deposit_success.html", s=inquiry,
-        payment_type=payment_type)
+    return render_template("deposit_success.html", s=inquiry, payment_type=payment_type)
 
 
 # ─── Admin Routes ─────────────────────────────────────────────────────────────
@@ -407,7 +383,6 @@ def admin_logout():
 @admin_required
 def admin_dashboard():
     submissions = load_submissions()
-    submissions = list(reversed(submissions))
     return render_template("admin_dashboard.html", submissions=submissions)
 
 
@@ -424,18 +399,36 @@ def admin_submission_detail(submission_id):
 @admin_required
 def admin_download_contract(submission_id):
     submission = get_submission_by_id(submission_id)
-    if not submission or not os.path.exists(submission["contract_path"]):
+    if not submission or not submission.contract_path or not os.path.exists(submission.contract_path):
         return "Contract not found.", 404
-    return send_file(submission["contract_path"], as_attachment=True)
+    return send_file(submission.contract_path, as_attachment=True)
 
 
 @app.route("/admin/download/inq_spot/<int:submission_id>")
 @admin_required
 def admin_download_inq_spot(submission_id):
     submission = get_submission_by_id(submission_id)
-    if not submission or not os.path.exists(submission["inq_spot_path"]):
+    if not submission or not submission.inq_spot_path or not os.path.exists(submission.inq_spot_path):
         return "INQ Spot not found.", 404
-    return send_file(submission["inq_spot_path"], as_attachment=True)
+    return send_file(submission.inq_spot_path, as_attachment=True)
+
+
+@app.route("/admin/advance/<token>", methods=["POST"])
+@admin_required
+def advance_stage(token):
+    from models import Inquiry
+    stages = [
+        "inq_submitted", "contract_signed", "deposit_paid",
+        "shoot_scheduled", "in_editing", "delivered"
+    ]
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return jsonify({"success": False}), 404
+    current_idx = stages.index(inquiry.stage) if inquiry.stage in stages else 0
+    if current_idx < len(stages) - 1:
+        inquiry.stage = stages[current_idx + 1]
+        db.session.commit()
+    return jsonify({"success": True, "new_stage": inquiry.stage})
 
 
 def is_safe_input(text):
