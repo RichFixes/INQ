@@ -29,7 +29,6 @@
       min-height: 100vh;
     }
 
-    /* Header */
     header {
       border-bottom: 1px solid var(--border);
       padding: 0 32px;
@@ -45,178 +44,87 @@
 
     .header-left { display: flex; align-items: center; gap: 16px; }
     .header-left img { max-height: 48px; filter: brightness(0) invert(1); }
-
-    .header-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 16px;
-      letter-spacing: -0.3px;
-    }
-
-    .badge {
-      background: var(--accent);
-      color: #0a0a0f;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 99px;
-      font-family: 'Syne', sans-serif;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .logout-btn {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-      text-decoration: none;
-      border: 1px solid var(--border);
-      padding: 6px 14px;
-      border-radius: 6px;
-      transition: all 0.2s;
-    }
+    .header-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: -0.3px; }
+    .badge { background: var(--accent); color: #0a0a0f; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; font-family: 'Syne', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+    .logout-btn { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); text-decoration: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; transition: all 0.2s; }
     .logout-btn:hover { border-color: var(--muted); color: var(--text); }
 
-    /* Main */
     main { padding: 40px 32px; max-width: 1200px; margin: 0 auto; }
 
-    .page-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 6px;
-    }
+    /* Tabs */
+    .tab-row { display: flex; gap: 8px; margin-bottom: 32px; }
+    .tab { font-family: 'DM Mono', monospace; font-size: 12px; padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border); background: none; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .tab.active { background: var(--accent); color: #0a0a0f; border-color: var(--accent); font-weight: 700; }
 
-    .page-subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 36px;
-    }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; }
+    .page-subtitle { color: var(--muted); font-size: 13px; margin-bottom: 36px; }
 
-    /* Stats row */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 36px;
-    }
-
-    .stat-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 24px;
-    }
-
-    .stat-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-family: 'Syne', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
-
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; }
+    .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 8px; }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
     .stat-value.green { color: var(--green); }
     .stat-value.blue  { color: var(--blue); }
     .stat-value.orange { color: var(--orange); }
     .stat-value.accent { color: var(--accent); }
 
-    /* Empty state */
-    .empty {
-      text-align: center;
-      padding: 80px 20px;
-      color: var(--muted);
-    }
+    .empty { text-align: center; padding: 80px 20px; color: var(--muted); }
     .empty-icon { font-size: 48px; margin-bottom: 16px; }
     .empty h2 { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
 
-    /* Table */
-    .table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
+    .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
     table { width: 100%; border-collapse: collapse; }
-
-    thead tr {
-      border-bottom: 1px solid var(--border);
-    }
-
-    th {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--muted);
-      padding: 14px 20px;
-      text-align: left;
-      font-weight: 500;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
-    }
+    thead tr { border-bottom: 1px solid var(--border); }
+    th { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 14px 20px; text-align: left; font-weight: 500; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: var(--surface2); }
-
-    td {
-      padding: 16px 20px;
-      font-size: 13px;
-      vertical-align: middle;
-    }
-
-    .client-name {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
+    td { padding: 16px 20px; font-size: 13px; vertical-align: middle; }
+    .client-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
     .client-email { color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-    .pkg-badge {
-      font-size: 10px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 99px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .pkg-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px; }
     .pkg-basic    { background: rgba(71,178,255,0.15); color: var(--blue); }
     .pkg-standard { background: rgba(232,255,71,0.15); color: var(--accent); }
     .pkg-premium  { background: rgba(71,255,178,0.15); color: var(--green); }
     .pkg-custom   { background: rgba(255,178,71,0.15); color: var(--orange); }
+    .service-tag { font-size: 12px; color: var(--muted); }
+    .view-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px; padding: 7px 14px; border-radius: 6px; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
+    .view-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    .service-tag {
-      font-size: 12px;
-      color: var(--muted);
-    }
+    /* FullCalendar overrides */
+    .fc { color: var(--text) !important; }
+    .fc-toolbar-title { font-family: 'Syne', sans-serif !important; font-size: 18px !important; color: var(--text) !important; }
+    .fc-button { background: var(--surface2) !important; border-color: var(--border) !important; color: var(--text) !important; font-family: 'DM Mono', monospace !important; font-size: 11px !important; }
+    .fc-button:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+    .fc-button-active { background: var(--accent) !important; color: #0a0a0f !important; border-color: var(--accent) !important; }
+    .fc-daygrid-day { background: var(--surface) !important; }
+    .fc-daygrid-day:hover { background: var(--surface2) !important; }
+    .fc-col-header-cell { background: var(--surface2) !important; }
+    .fc-scrollgrid { border-color: var(--border) !important; }
+    .fc-scrollgrid td, .fc-scrollgrid th { border-color: var(--border) !important; }
+    .fc-daygrid-day-number { color: var(--muted) !important; }
+    .fc-day-today { background: rgba(232,255,71,0.04) !important; }
 
-    .view-btn {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      padding: 7px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: all 0.2s;
-      white-space: nowrap;
-    }
-    .view-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    /* Stage legend */
+    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Stage popup */
+    .stage-popup { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(5,5,8,0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; }
+    .stage-popup.open { display: flex; }
+    .stage-popup-inner { background: #12121a; border: 1px solid var(--border); border-radius: 14px; padding: 32px; max-width: 400px; width: 90%; }
+    .popup-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .popup-service { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .popup-date { color: var(--muted); font-size: 11px; margin-bottom: 20px; }
+    .popup-stage { display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 4px 14px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; }
+    .advance-btn { width: 100%; padding: 14px; background: var(--accent); color: #0a0a0f; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; margin-bottom: 10px; transition: opacity 0.2s; display: block; text-align: center; text-decoration: none; }
+    .advance-btn:hover { opacity: 0.85; }
+    .advance-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .advance-btn.secondary:hover { border-color: var(--accent); color: var(--accent); opacity: 1; }
+    .popup-close { width: 100%; padding: 10px; background: none; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 12px; border-radius: 8px; cursor: pointer; margin-top: 4px; }
+    .popup-close:hover { border-color: var(--muted); color: var(--text); }
+    .delivered-notice { text-align: center; color: var(--green); font-size: 12px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -231,80 +139,252 @@
 </header>
 
 <main>
-  <h1 class="page-title">Inquiries</h1>
-  <p class="page-subtitle">All client submissions — newest first</p>
 
-  <!-- Stats -->
-  {% set total = submissions | length %}
-  {% set premium_count = submissions | selectattr('package', 'equalto', 'Premium') | list | length %}
-  {% set custom_count  = submissions | selectattr('package', 'equalto', 'Custom')  | list | length %}
-  <div class="stats">
-    <div class="stat-card">
-      <div class="stat-label">Total Inquiries</div>
-      <div class="stat-value accent">{{ total }}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Premium Packages</div>
-      <div class="stat-value green">{{ premium_count }}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Custom Quotes</div>
-      <div class="stat-value orange">{{ custom_count }}</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">AI Briefs Generated</div>
-      <div class="stat-value blue">{{ total }}</div>
-    </div>
+  <!-- Tabs -->
+  <div class="tab-row">
+    <button class="tab active" onclick="switchTab('list', this)">Inquiries</button>
+    <button class="tab" onclick="switchTab('calendar', this)">Calendar</button>
   </div>
 
-  {% if submissions %}
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Client</th>
-          <th>Service</th>
-          <th>Package</th>
-          <th>Event Date</th>
-          <th>Submitted</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for s in submissions %}
-        <tr>
-          <td style="color: var(--muted); font-size:12px;">{{ s.id }}</td>
-          <td>
-            <div class="client-name">{{ s.name }}</div>
-            <div class="client-email">{{ s.email }}</div>
-          </td>
-          <td><span class="service-tag">{{ s.service }}</span></td>
-          <td>
-            <span class="pkg-badge pkg-{{ s.package | lower }}">{{ s.package }}</span>
-            <div style="font-size:11px; color:var(--muted); margin-top:3px;">{{ s.budget_display }}</div>
-          </td>
-          <td style="font-size:13px;">{{ s.event_date }}</td>
-          <td style="font-size:11px; color:var(--muted);">{{ s.submitted_at }}</td>
-          <td>
-            <a href="{{ url_for('admin_submission_detail', submission_id=s.id) }}" class="view-btn">
-              View Brief →
-            </a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- ── List View ── -->
+  <div id="tab-list">
+    <h1 class="page-title">Inquiries</h1>
+    <p class="page-subtitle">All client submissions — newest first</p>
+
+    {% set total = submissions | length %}
+    {% set premium_count = submissions | selectattr('package', 'equalto', 'Premium') | list | length %}
+    {% set custom_count  = submissions | selectattr('package', 'equalto', 'Custom')  | list | length %}
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Inquiries</div>
+        <div class="stat-value accent">{{ total }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Premium Packages</div>
+        <div class="stat-value green">{{ premium_count }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Custom Quotes</div>
+        <div class="stat-value orange">{{ custom_count }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">AI Briefs Generated</div>
+        <div class="stat-value blue">{{ total }}</div>
+      </div>
+    </div>
+
+    {% if submissions %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Client</th>
+            <th>Service</th>
+            <th>Package</th>
+            <th>Event Date</th>
+            <th>Submitted</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in submissions %}
+          <tr>
+            <td style="color: var(--muted); font-size:12px;">{{ s.id }}</td>
+            <td>
+              <div class="client-name">{{ s.name }}</div>
+              <div class="client-email">{{ s.email }}</div>
+            </td>
+            <td><span class="service-tag">{{ s.service }}</span></td>
+            <td>
+              <span class="pkg-badge pkg-{{ s.package | lower }}">{{ s.package }}</span>
+              <div style="font-size:11px; color:var(--muted); margin-top:3px;">{{ s.budget_display }}</div>
+            </td>
+            <td style="font-size:13px;">{{ s.event_date }}</td>
+            <td style="font-size:11px; color:var(--muted);">{{ s.submitted_at }}</td>
+            <td>
+              <a href="{{ url_for('admin_submission_detail', submission_id=s.id) }}" class="view-btn">
+                View Brief →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty">
+      <div class="empty-icon">📭</div>
+      <h2>No submissions yet</h2>
+      <p>Client inquiries will appear here once the form is submitted.</p>
+    </div>
+    {% endif %}
   </div>
 
-  {% else %}
-  <div class="empty">
-    <div class="empty-icon">📭</div>
-    <h2>No submissions yet</h2>
-    <p>Client inquiries will appear here once the form is submitted.</p>
+  <!-- ── Calendar View ── -->
+  <div id="tab-calendar" style="display:none;">
+    <h1 class="page-title">Calendar</h1>
+    <p class="page-subtitle">All bookings color-coded by stage — click any event to advance</p>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#55556a"></div>INQ Submitted</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#47b2ff"></div>Contract Signed</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e8ff47"></div>Deposit Paid</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffb247"></div>Shoot Scheduled</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c47aff"></div>In Editing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#47ffb2"></div>Delivered</div>
+    </div>
+
+    <div id="adminCalendar" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px;"></div>
   </div>
-  {% endif %}
+
 </main>
+
+<!-- Stage popup -->
+<div class="stage-popup" id="stagePopup">
+  <div class="stage-popup-inner">
+    <div class="popup-name" id="popupName"></div>
+    <div class="popup-service" id="popupService"></div>
+    <div class="popup-date" id="popupDate"></div>
+    <div class="popup-stage" id="popupStage"></div>
+    <div id="advanceSection">
+      <button class="advance-btn" id="advanceBtn" onclick="advanceStage()">
+        Advance Stage →
+      </button>
+    </div>
+    <a id="viewBtn" href="#" class="advance-btn secondary">View Full Brief →</a>
+    <button class="popup-close" onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+  const STAGE_COLORS = {
+    'inq_submitted':   '#55556a',
+    'contract_signed': '#47b2ff',
+    'deposit_paid':    '#e8ff47',
+    'shoot_scheduled': '#ffb247',
+    'in_editing':      '#c47aff',
+    'delivered':       '#47ffb2'
+  };
+
+  const STAGE_LABELS = {
+    'inq_submitted':   'INQ Submitted',
+    'contract_signed': 'Contract Signed',
+    'deposit_paid':    'Deposit Paid',
+    'shoot_scheduled': 'Shoot Scheduled',
+    'in_editing':      'In Editing',
+    'delivered':       'Delivered'
+  };
+
+  const NEXT_STAGE_LABELS = {
+    'inq_submitted':   'Mark Contract Signed',
+    'contract_signed': 'Mark Deposit Paid',
+    'deposit_paid':    'Mark Shoot Scheduled',
+    'shoot_scheduled': 'Mark In Editing',
+    'in_editing':      'Mark Delivered',
+    'delivered':       null
+  };
+
+  const events = [
+    {% for s in submissions %}
+    {
+      title: '{{ s.name | replace("'", "\\'") }}',
+      start: '{{ s.shoot_date or s.event_date }}',
+      backgroundColor: STAGE_COLORS['{{ s.stage }}'] || '#55556a',
+      borderColor: STAGE_COLORS['{{ s.stage }}'] || '#55556a',
+      textColor: '{{ "#0a0a0f" if s.stage == "deposit_paid" or s.stage == "delivered" else "#f0f0f0" }}',
+      extendedProps: {
+        token: '{{ s.token }}',
+        service: '{{ s.service }}',
+        stage: '{{ s.stage }}',
+        eventDate: '{{ s.shoot_date or s.event_date }}',
+        submissionId: {{ s.id }}
+      }
+    },
+    {% endfor %}
+  ];
+
+  let currentToken = null;
+  let currentEventObj = null;
+
+  const calendarEl = document.getElementById('adminCalendar');
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,dayGridWeek'
+    },
+    height: 'auto',
+    events: events,
+    eventClick: function(info) {
+      const props = info.event.extendedProps;
+      currentToken = props.token;
+      currentEventObj = info.event;
+
+      document.getElementById('popupName').textContent = info.event.title;
+      document.getElementById('popupService').textContent = props.service;
+      document.getElementById('popupDate').textContent = '📅 ' + (props.eventDate || 'Date TBD');
+      document.getElementById('popupStage').textContent = STAGE_LABELS[props.stage] || props.stage;
+      document.getElementById('viewBtn').href = '/admin/submission/' + props.submissionId;
+
+      const nextLabel = NEXT_STAGE_LABELS[props.stage];
+      const advSection = document.getElementById('advanceSection');
+      if (nextLabel) {
+        advSection.innerHTML = `<button class="advance-btn" onclick="advanceStage()">${nextLabel} →</button>`;
+      } else {
+        advSection.innerHTML = `<div class="delivered-notice">✓ Project Delivered</div>`;
+      }
+
+      document.getElementById('stagePopup').classList.add('open');
+    }
+  });
+
+  function switchTab(tab, btn) {
+    document.getElementById('tab-list').style.display = tab === 'list' ? 'block' : 'none';
+    document.getElementById('tab-calendar').style.display = tab === 'calendar' ? 'block' : 'none';
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    if (tab === 'calendar') {
+      setTimeout(() => calendar.render(), 50);
+    }
+  }
+
+  function closePopup() {
+    document.getElementById('stagePopup').classList.remove('open');
+    currentToken = null;
+    currentEventObj = null;
+  }
+
+  function advanceStage() {
+    if (!currentToken) return;
+    fetch('/admin/advance/' + currentToken, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && currentEventObj) {
+          const newColor = STAGE_COLORS[data.new_stage] || '#55556a';
+          currentEventObj.setProp('backgroundColor', newColor);
+          currentEventObj.setProp('borderColor', newColor);
+          currentEventObj.setExtendedProp('stage', data.new_stage);
+
+          const nextLabel = NEXT_STAGE_LABELS[data.new_stage];
+          document.getElementById('popupStage').textContent = STAGE_LABELS[data.new_stage];
+          const advSection = document.getElementById('advanceSection');
+          if (nextLabel) {
+            advSection.innerHTML = `<button class="advance-btn" onclick="advanceStage()">${nextLabel} →</button>`;
+          } else {
+            advSection.innerHTML = `<div class="delivered-notice">✓ Project Delivered</div>`;
+          }
+        }
+      });
+  }
+
+  document.getElementById('stagePopup').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+</script>
 
 </body>
 </html>

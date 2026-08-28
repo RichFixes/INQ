@@ -128,6 +128,48 @@ def inquiry_status(token):
     if not inquiry:
         return render_template("404.html"), 404
     return render_template("inquiry_status.html", s=inquiry)
+@app.route("/sign/<token>", methods=["GET", "POST"])
+def sign_contract(token):
+    from models import Inquiry
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return "Inquiry not found.", 404
+    if inquiry.contract_signed:
+        return redirect(url_for("inquiry_status", token=token))
+    return render_template("sign_contract.html", s=inquiry)
+
+
+@app.route("/sign/<token>/submit", methods=["POST"])
+def submit_signature(token):
+    from models import Inquiry
+    import base64
+    from weasyprint import HTML
+
+    inquiry = Inquiry.query.filter_by(token=token).first()
+    if not inquiry:
+        return "Inquiry not found.", 404
+
+    signature_data = request.form.get("signature_data", "")
+    if not signature_data or "," not in signature_data:
+        flash("Signature is required.")
+        return redirect(url_for("sign_contract", token=token))
+
+    # Save signed contract as PDF
+    os.makedirs("contracts", exist_ok=True)
+    signed_path = f"contracts/{inquiry.name.replace(' ', '_')}_signed.pdf"
+
+    html_content = render_template("contract_pdf.html",
+        s=inquiry,
+        signature_data=signature_data
+    )
+    HTML(string=html_content).write_pdf(signed_path)
+
+    # Update DB
+    inquiry.contract_signed = True
+    inquiry.contract_path = signed_path
+    db.session.commit()
+
+    return redirect(url_for("inquiry_status", token=token))
 
 import stripe
 
