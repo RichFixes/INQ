@@ -135,6 +135,12 @@
 
     <div class="stage-badge">{{ s.stage | replace('_', ' ') | title }}</div>
 
+    {% if not s.contract_signed %}
+    <a href="{{ url_for('sign_contract', token=s.token) }}" class="pay-btn" style="background: transparent; border: 1px solid var(--gold); color: var(--gold); margin-bottom: 12px; display:block; text-align:center; padding:14px; border-radius:10px; text-decoration:none; font-family:'Syne',sans-serif; font-weight:700;">
+      Review & Sign Contract →
+    </a>
+    {% endif %}
+    
     {% if not s.deposit_paid %}
       {% if custom_quote is defined and custom_quote %}
       <div class="paid-notice" style="color: var(--muted);">
