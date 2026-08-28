@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Your Contract — UwemMedia</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='Uwem_Logo.png') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a26;
+      --border: #222230;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --text: #f0f0f0;
+      --muted: #55556a;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 40px;
+    }
+    .logo-row img {
+      height: 40px;
+      filter: brightness(0) invert(1);
+      opacity: 0.85;
+    }
+    .logo-row span {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 36px;
+    }
+
+    /* Contract body */
+    .contract-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 28px;
+    }
+    .contract-section {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .contract-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+    .contract-section p, .contract-section li {
+      font-size: 12px;
+      line-height: 1.9;
+      color: rgba(240,240,240,0.75);
+    }
+    .contract-section ul { padding-left: 16px; }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-key { color: var(--muted); }
+    .detail-val { color: var(--text); }
+    .highlight {
+      color: var(--gold-light);
+      font-weight: 600;
+    }
+
+    /* Signature pad */
+    .sig-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 28px;
+    }
+    .sig-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+    .sig-instruction {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    #sigCanvas {
+      width: 100%;
+      height: 160px;
+      background: #0a0a0f;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: crosshair;
+      touch-action: none;
+      display: block;
+    }
+    #sigCanvas.signed {
+      border-color: var(--gold);
+    }
+    .sig-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .clear-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .clear-btn:hover { border-color: var(--muted); color: var(--text); }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--gold);
+      color: #0a0a0f;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .submit-btn:hover { opacity: 0.85; }
+    .submit-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    .agree-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .agree-row input { width: auto; margin-top: 3px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo-row">
+    <img src="{{ url_for('static', filename='Uwem_Logo.png') }}" alt="UwemMedia">
+    <span>UwemMedia</span>
+  </div>
+
+  <h1>Service Agreement</h1>
+  <p class="subtitle">Review your contract carefully before signing.</p>
+
+  <!-- Contract -->
+  <div class="contract-card">
+
+    <div class="contract-section">
+      <div class="section-title">Client & Project Details</div>
+      <div class="detail-row"><span class="detail-key">Client</span><span class="detail-val">{{ s.name }}</span></div>
+      <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">{{ s.email }}</span></div>
+      <div class="detail-row"><span class="detail-key">Service</span><span class="detail-val">{{ s.service }}</span></div>
+      <div class="detail-row"><span class="detail-key">Package</span><span class="detail-val">{{ s.package }}</span></div>
+      <div class="detail-row"><span class="detail-key">Event Date</span><span class="detail-val">{{ s.event_date }}</span></div>
+      <div class="detail-row"><span class="detail-key">Budget Range</span><span class="detail-val">{{ s.budget_display }}</span></div>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">Project Description</div>
+      <p>{{ s.details }}</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">Scope of Services</div>
+      <ul>
+        <li>30-minute pre-production consultation</li>
+        <li>Filming per package duration</li>
+        <li>Professional editing with revisions per package tier</li>
+        <li>Final delivery in MP4 format within 2 weeks of shoot date</li>
+      </ul>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">Payment Terms</div>
+      <p>A <span class="highlight">30% deposit</span> is due upon signing to confirm your booking. The remaining balance is due on delivery. Cancellations within 5 days of the event date forfeit the deposit.</p>
+    </div>
+
+    <div class="contract-section">
+      <div class="section-title">Rights & Responsibilities</div>
+      <ul>
+        <li>UwemMedia retains copyright to all raw footage.</li>
+        <li>Client is granted rights for personal and promotional use.</li>
+        <li>Client must provide necessary access and permissions.</li>
+        <li>UwemMedia is not liable for circumstances beyond control.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Signature -->
+  <form method="POST" action="{{ url_for('submit_signature', token=s.token) }}" id="signForm">
+    <input type="hidden" name="signature_data" id="signatureData">
+
+    <div class="sig-card">
+      <div class="sig-label">Your Signature</div>
+      <p class="sig-instruction">Sign below using your mouse or finger.</p>
+      <canvas id="sigCanvas" width="648" height="160"></canvas>
+      <div class="sig-actions">
+        <button type="button" class="clear-btn" onclick="clearSignature()">Clear</button>
+      </div>
+    </div>
+
+    <div class="agree-row">
+      <input type="checkbox" id="agree" onchange="toggleSubmit()">
+      <label for="agree" style="text-transform:none; font-size:12px; letter-spacing:0; color:var(--muted);">
+        I, <strong style="color:var(--text);">{{ s.name }}</strong>, agree to the terms of this service agreement and authorize UwemMedia to proceed upon receipt of my deposit.
+      </label>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn" disabled onclick="prepareSubmit()">
+      Sign & Confirm →
+    </button>
+  </form>
+
+</div>
+
+<script>
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let hasSigned = false;
+
+  // Scale canvas for retina
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    ctx.strokeStyle = '#e8c97a';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top
+      };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(...Object.values(getPos(e))); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSigned = true; canvas.classList.add('signed'); });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); ctx.moveTo(...Object.values(getPos(e))); }, { passive: false });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSigned = true; canvas.classList.add('signed'); }, { passive: false });
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSigned = false;
+    canvas.classList.remove('signed');
+    toggleSubmit();
+  }
+
+  function toggleSubmit() {
+    const agreed = document.getElementById('agree').checked;
+    document.getElementById('submitBtn').disabled = !(agreed && hasSigned);
+  }
+
+  canvas.addEventListener('mousemove', toggleSubmit);
+  canvas.addEventListener('touchmove', toggleSubmit);
+
+  function prepareSubmit() {
+    document.getElementById('signatureData').value = canvas.toDataURL('image/png');
+  }
+</script>
+</body>
+</html>

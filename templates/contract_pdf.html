@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Georgia, serif; font-size: 12px; color: #111; padding: 48px; line-height: 1.7; }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin: 28px 0 10px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    .meta-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+    .meta-key { color: #666; }
+    ul { padding-left: 18px; }
+    li { margin-bottom: 6px; }
+    .sig-section { margin-top: 40px; }
+    .sig-img { max-width: 280px; border-bottom: 1px solid #111; margin-bottom: 4px; }
+    .sig-name { font-size: 11px; color: #666; }
+    .footer { margin-top: 48px; font-size: 10px; color: #999; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>UwemMedia Service Agreement</h1>
+  <p style="color:#666; font-size:11px;">Generated {{ s.submitted_at }}</p>
+
+  <h2>Client & Project Details</h2>
+  <div class="meta-row"><span class="meta-key">Client</span><span>{{ s.name }}</span></div>
+  <div class="meta-row"><span class="meta-key">Email</span><span>{{ s.email }}</span></div>
+  <div class="meta-row"><span class="meta-key">Service</span><span>{{ s.service }}</span></div>
+  <div class="meta-row"><span class="meta-key">Package</span><span>{{ s.package }}</span></div>
+  <div class="meta-row"><span class="meta-key">Event Date</span><span>{{ s.event_date }}</span></div>
+  <div class="meta-row"><span class="meta-key">Budget Range</span><span>{{ s.budget_display }}</span></div>
+
+  <h2>Project Description</h2>
+  <p>{{ s.details }}</p>
+
+  <h2>Scope of Services</h2>
+  <ul>
+    <li>30-minute pre-production consultation</li>
+    <li>Filming per package duration</li>
+    <li>Professional editing with revisions per package tier</li>
+    <li>Final delivery in MP4 format within 2 weeks of shoot date</li>
+  </ul>
+
+  <h2>Payment Terms</h2>
+  <p>A 30% deposit is due upon signing to confirm your booking. Remaining balance due on delivery. Cancellations within 5 days forfeit the deposit.</p>
+
+  <h2>Rights & Responsibilities</h2>
+  <ul>
+    <li>UwemMedia retains copyright to all raw footage.</li>
+    <li>Client is granted rights for personal and promotional use.</li>
+    <li>Client must provide necessary access and permissions.</li>
+    <li>UwemMedia is not liable for circumstances beyond control.</li>
+  </ul>
+
+  <div class="sig-section">
+    <h2>Client Signature</h2>
+    <img class="sig-img" src="{{ signature_data }}">
+    <div class="sig-name">{{ s.name }} — digitally signed</div>
+  </div>
+
+  <div class="footer">UwemMedia · uwem.art · This document constitutes a binding service agreement.</div>
+</body>
+</html>

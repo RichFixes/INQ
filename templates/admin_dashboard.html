@@ -292,9 +292,9 @@
     {
       title: '{{ s.name | replace("'", "\\'") }}',
       start: '{{ s.shoot_date or s.event_date }}',
-      backgroundColor: STAGE_COLORS['{{ s.stage }}'] || '#55556a',
-      borderColor: STAGE_COLORS['{{ s.stage }}'] || '#55556a',
-      textColor: '{{ "#0a0a0f" if s.stage == "deposit_paid" or s.stage == "delivered" else "#f0f0f0" }}',
+      backgroundColor: '{{ {"inq_submitted":"#55556a","contract_signed":"#47b2ff","deposit_paid":"#e8ff47","shoot_scheduled":"#ffb247","in_editing":"#c47aff","delivered":"#47ffb2"}.get(s.stage, "#55556a") }}',
+      borderColor: '{{ {"inq_submitted":"#55556a","contract_signed":"#47b2ff","deposit_paid":"#e8ff47","shoot_scheduled":"#ffb247","in_editing":"#c47aff","delivered":"#47ffb2"}.get(s.stage, "#55556a") }}',
+      textColor: '{{ "#0a0a0f" if s.stage in ["deposit_paid", "delivered"] else "#f0f0f0" }}',
       extendedProps: {
         token: '{{ s.token }}',
         service: '{{ s.service }}',
