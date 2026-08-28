@@ -6,4 +6,6 @@ reportlab
 pillow
 pytest
 flask-sqlalchemy==3.1.1
-stripeweasyprint
+stripe
+weasyprint
+anthropic
