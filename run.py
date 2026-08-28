@@ -307,7 +307,9 @@ def checkout(token):
 
 @app.route("/checkout/<token>/pay/<payment_type>")
 def checkout_pay(token, payment_type):
-    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    key = os.getenv("STRIPE_SECRET_KEY", "NOT_FOUND")
+    app.logger.info(f"STRIPE KEY STATUS: {'SET' if key != 'NOT_FOUND' else 'MISSING'} / starts with: {key[:8]}")
+    stripe.api_key = key
     from models import Inquiry
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
