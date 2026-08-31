@@ -279,7 +279,7 @@ def submit_signature(token):
 
 @app.route("/checkout/<token>")
 def checkout(token):
-    stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+    stripe.api_key = os.getenv("STRIPE_SECRET_KEY", "").strip().strip('"').strip("'")
     from models import Inquiry
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
@@ -308,7 +308,7 @@ def checkout(token):
 def checkout_pay(token, payment_type):
     key = os.getenv("STRIPE_SECRET_KEY", "NOT_FOUND")
     app.logger.info(f"STRIPE KEY STATUS: {'SET' if key != 'NOT_FOUND' else 'MISSING'} / starts with: {key[:8]}")
-    stripe.api_key = key
+    stripe.api_key = key.strip().strip('"').strip("'")
     from models import Inquiry
     inquiry = Inquiry.query.filter_by(token=token).first()
     if not inquiry:
@@ -433,9 +433,8 @@ def advance_stage(token):
 
 @app.route("/debug/stripe")
 def debug_stripe():
-    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING")
-    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12] if key != 'MISSING' else 'N/A'}"
-
+    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING").strip().strip('"').strip("'")
+    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12]}"
 
 def is_safe_input(text):
     pattern = re.compile(r'^[a-zA-Z0-9\s.,!?-]+$')
