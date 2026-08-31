@@ -303,7 +303,10 @@ def checkout(token):
         deposit_display=f"${base_amount * 0.30:,.0f}",
         full_display=f"${base_amount:,}"
     )
-
+@app.route("/debug/stripe")
+def debug_stripe():
+    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING")
+    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12] if key != 'MISSING' else 'N/A'}"
 
 @app.route("/checkout/<token>/pay/<payment_type>")
 def checkout_pay(token, payment_type):
