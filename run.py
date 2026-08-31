@@ -303,10 +303,6 @@ def checkout(token):
         deposit_display=f"${base_amount * 0.30:,.0f}",
         full_display=f"${base_amount:,}"
     )
-@app.route("/debug/stripe")
-def debug_stripe():
-    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING")
-    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12] if key != 'MISSING' else 'N/A'}"
 
 @app.route("/checkout/<token>/pay/<payment_type>")
 def checkout_pay(token, payment_type):
@@ -434,6 +430,11 @@ def advance_stage(token):
         inquiry.stage = stages[current_idx + 1]
         db.session.commit()
     return jsonify({"success": True, "new_stage": inquiry.stage})
+
+@app.route("/debug/stripe")
+def debug_stripe():
+    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING")
+    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12] if key != 'MISSING' else 'N/A'}"
 
 
 def is_safe_input(text):
