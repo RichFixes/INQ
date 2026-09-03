@@ -104,8 +104,50 @@
       color: var(--green);
       font-size: 13px;
     }
+    .terms-box {
+      background: rgba(255,159,71,0.06);
+      border: 1px solid rgba(255,159,71,0.2);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .terms-box-title {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ff9f47;
+      margin-bottom: 10px;
+    }
+    .terms-box p {
+      font-size: 11px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+    .terms-box strong { color: #ff9f47; }
+    .pay-agree-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .pay-agree-row input {
+      margin-top: 2px;
+      accent-color: #e8ff47;
+      flex-shrink: 0;
+    }
   </style>
 </head>
+<script>
+  function togglePay() {
+    const btn = document.getElementById('payBtn');
+    const checked = document.getElementById('payAgree').checked;
+    btn.style.pointerEvents = checked ? 'auto' : 'none';
+    btn.style.opacity = checked ? '1' : '0.3';
+  }
+</script>
 <body>
   <div class="card">
     <div class="logo">UwemMedia · INQ</div>
@@ -130,7 +172,7 @@
     </div>
     <div class="status-row">
       <span class="status-label">Shoot Date</span>
-      <span class="status-val">{{ s.shoot_date or '— TBD' }}</span>
+      <span class="status-val">{{ s.shoot_date or s.event_date or '— TBD' }}</span>
     </div>
 
     <div class="stage-badge">{{ s.stage | replace('_', ' ') | title }}</div>
@@ -140,14 +182,22 @@
       Review & Sign Contract →
     </a>
     {% endif %}
-    
+
     {% if not s.deposit_paid %}
       {% if custom_quote is defined and custom_quote %}
       <div class="paid-notice" style="color: var(--muted);">
         Custom quote — we'll send your deposit amount directly.
       </div>
       {% else %}
-      <a href="{{ url_for('checkout', token=s.token) }}" class="pay-btn">Pay Deposit Now →</a>
+      <div class="terms-box">
+        <div class="terms-box-title">Payment Terms & Conditions</div>
+        <p>By paying your deposit you confirm that you have read and agreed to the UwemMedia Service Agreement signed above. Deposits are <strong>non-refundable</strong>. Cancellations within 5 days of your shoot date forfeit the deposit in full. No-shows forfeit the deposit entirely. Initiating a chargeback waives your right to receive any deliverables.</p>
+      </div>
+      <div class="pay-agree-row">
+        <input type="checkbox" id="payAgree" onchange="togglePay()">
+        <label for="payAgree">I agree to the payment terms and confirm my deposit is non-refundable.</label>
+      </div>
+      <a href="{{ url_for('checkout', token=s.token) }}" class="pay-btn" id="payBtn" style="pointer-events:none; opacity:0.3;">Pay Deposit Now →</a>
       {% endif %}
     {% else %}
     <div class="paid-notice">✓ Deposit received — you're confirmed.</div>

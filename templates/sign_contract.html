@@ -17,6 +17,7 @@
       --gold-light: #e8c97a;
       --text: #f0f0f0;
       --muted: #55556a;
+      --green: #47ffb2;
     }
     body {
       background: var(--bg);
@@ -25,40 +26,13 @@
       min-height: 100vh;
       padding: 40px 20px;
     }
-    .wrap {
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 40px;
-    }
-    .logo-row img {
-      height: 40px;
-      filter: brightness(0) invert(1);
-      opacity: 0.85;
-    }
-    .logo-row span {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 15px;
-    }
-    h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 6px;
-    }
-    .subtitle {
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 36px;
-    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 40px; }
+    .logo-row img { height: 40px; filter: brightness(0) invert(1); opacity: 0.85; }
+    .logo-row span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-bottom: 36px; }
 
-    /* Contract body */
     .contract-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -71,11 +45,7 @@
       padding-bottom: 28px;
       border-bottom: 1px solid var(--border);
     }
-    .contract-section:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
-    }
+    .contract-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .section-title {
       font-size: 10px;
       text-transform: uppercase;
@@ -83,12 +53,20 @@
       color: var(--gold);
       margin-bottom: 14px;
     }
+    .section-num {
+      font-size: 9px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
     .contract-section p, .contract-section li {
       font-size: 12px;
       line-height: 1.9;
       color: rgba(240,240,240,0.75);
     }
-    .contract-section ul { padding-left: 16px; }
+    .contract-section ul { padding-left: 16px; margin-top: 8px; }
+    .contract-section li { margin-bottom: 4px; }
     .detail-row {
       display: flex;
       justify-content: space-between;
@@ -99,9 +77,23 @@
     .detail-row:last-child { border-bottom: none; }
     .detail-key { color: var(--muted); }
     .detail-val { color: var(--text); }
-    .highlight {
-      color: var(--gold-light);
-      font-weight: 600;
+    .highlight { color: var(--gold-light); font-weight: 600; }
+    .warning { color: #ff9f47; font-weight: 600; }
+
+    /* Terms divider */
+    .terms-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 8px 0 28px;
+    }
+    .terms-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .terms-divider-text {
+      font-size: 9px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
     }
 
     /* Signature pad */
@@ -112,18 +104,8 @@
       padding: 36px;
       margin-bottom: 28px;
     }
-    .sig-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--gold);
-      margin-bottom: 16px;
-    }
-    .sig-instruction {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 16px;
-    }
+    .sig-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--gold); margin-bottom: 16px; }
+    .sig-instruction { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
     #sigCanvas {
       width: 100%;
       height: 160px;
@@ -134,14 +116,8 @@
       touch-action: none;
       display: block;
     }
-    #sigCanvas.signed {
-      border-color: var(--gold);
-    }
-    .sig-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
+    #sigCanvas.signed { border-color: var(--gold); }
+    .sig-actions { display: flex; gap: 12px; margin-top: 12px; }
     .clear-btn {
       background: none;
       border: 1px solid var(--border);
@@ -155,7 +131,52 @@
     }
     .clear-btn:hover { border-color: var(--muted); color: var(--text); }
 
-    /* Submit */
+    /* Acknowledgment checkboxes */
+    .ack-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 36px;
+      margin-bottom: 28px;
+    }
+    .ack-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .ack-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: rgba(240,240,240,0.7);
+      line-height: 1.6;
+    }
+    .ack-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .ack-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .agree-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .agree-row input { width: auto; margin-top: 3px; }
+
     .submit-btn {
       width: 100%;
       padding: 16px;
@@ -170,20 +191,7 @@
       transition: opacity 0.2s;
     }
     .submit-btn:hover { opacity: 0.85; }
-    .submit-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-    .agree-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 20px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .agree-row input { width: auto; margin-top: 3px; }
+    .submit-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -195,11 +203,11 @@
   </div>
 
   <h1>Service Agreement</h1>
-  <p class="subtitle">Review your contract carefully before signing.</p>
+  <p class="subtitle">Read all terms carefully before signing. Your signature constitutes a binding agreement.</p>
 
-  <!-- Contract -->
   <div class="contract-card">
 
+    <!-- Client Details -->
     <div class="contract-section">
       <div class="section-title">Client & Project Details</div>
       <div class="detail-row"><span class="detail-key">Client</span><span class="detail-val">{{ s.name }}</span></div>
@@ -210,11 +218,13 @@
       <div class="detail-row"><span class="detail-key">Budget Range</span><span class="detail-val">{{ s.budget_display }}</span></div>
     </div>
 
+    <!-- Project Description -->
     <div class="contract-section">
       <div class="section-title">Project Description</div>
       <p>{{ s.details }}</p>
     </div>
 
+    <!-- Scope -->
     <div class="contract-section">
       <div class="section-title">Scope of Services</div>
       <ul>
@@ -225,21 +235,85 @@
       </ul>
     </div>
 
-    <div class="contract-section">
-      <div class="section-title">Payment Terms</div>
-      <p>A <span class="highlight">30% deposit</span> is due upon signing to confirm your booking. The remaining balance is due on delivery. Cancellations within 5 days of the event date forfeit the deposit.</p>
+    <!-- Terms divider -->
+    <div class="terms-divider">
+      <div class="terms-divider-line"></div>
+      <div class="terms-divider-text">Booking, Payment & Service Terms</div>
+      <div class="terms-divider-line"></div>
     </div>
 
+    <!-- 1. Deposit Policy -->
     <div class="contract-section">
+      <div class="section-num">Section 1</div>
+      <div class="section-title">Booking & Deposit Policy</div>
+      <p>A <span class="highlight">non-refundable deposit of 30%</span> of the total service fee is required to secure your booking. This deposit reserves your shoot date exclusively. The remaining balance is due upon delivery of the final product. By paying the deposit, the client acknowledges that their shoot date is confirmed and that UwemMedia has turned away other bookings on their behalf.</p>
+    </div>
+
+    <!-- 2. Cancellation -->
+    <div class="contract-section">
+      <div class="section-num">Section 2</div>
+      <div class="section-title">Cancellation & Rescheduling</div>
+      <p>Cancellations must be submitted in writing to <span class="highlight">UwemFilms@gmail.com</span> at least <span class="warning">5 days prior</span> to the scheduled shoot date. Cancellations made with proper notice may be eligible for a one-time credit toward a future UwemMedia booking at UwemMedia's sole discretion — no cash refunds will be issued. Cancellations within 5 days of the shoot date <span class="warning">forfeit the deposit in full</span>. Rescheduling is subject to availability and must be requested no less than 5 days in advance.</p>
+    </div>
+
+    <!-- 3. No-Show -->
+    <div class="contract-section">
+      <div class="section-num">Section 3</div>
+      <div class="section-title">No-Show Policy</div>
+      <p>Failure to appear at the scheduled shoot location within <span class="warning">30 minutes</span> of the agreed start time without prior written notice constitutes a no-show. No-shows result in <span class="warning">immediate forfeiture of the full deposit</span> and UwemMedia reserves the right to decline future bookings from the client.</p>
+    </div>
+
+    <!-- 4. Payment Disputes -->
+    <div class="contract-section">
+      <div class="section-num">Section 4</div>
+      <div class="section-title">Payment Disputes & Chargebacks</div>
+      <p>By signing this agreement, the client authorizes all charges outlined herein and agrees <span class="warning">not to initiate a chargeback or payment dispute</span> for charges that comply with this agreement. In the event of a dispute, the client understands that UwemMedia will submit this signed agreement, booking confirmation, payment records, and all communication to the issuing bank as evidence. Initiating a chargeback waives the client's right to receive any deliverables, including edited footage, raw files, or any other work product.</p>
+    </div>
+
+    <!-- 5. Rights -->
+    <div class="contract-section">
+      <div class="section-num">Section 5</div>
       <div class="section-title">Rights & Responsibilities</div>
       <ul>
-        <li>UwemMedia retains copyright to all raw footage.</li>
-        <li>Client is granted rights for personal and promotional use.</li>
-        <li>Client must provide necessary access and permissions.</li>
-        <li>UwemMedia is not liable for circumstances beyond control.</li>
+        <li>UwemMedia retains full copyright to all raw footage captured.</li>
+        <li>Client is granted a non-exclusive license for personal and promotional use of delivered final edits.</li>
+        <li>Client must provide necessary location access, permits, and permissions.</li>
+        <li>Client is responsible for notifying UwemMedia of any venue restrictions in advance.</li>
+        <li>UwemMedia may use delivered work in its portfolio unless otherwise agreed in writing.</li>
       </ul>
     </div>
 
+    <!-- 6. Liability -->
+    <div class="contract-section">
+      <div class="section-num">Section 6</div>
+      <div class="section-title">Release of Liability</div>
+      <p>To the fullest extent permitted by law, the client releases and holds harmless UwemMedia, its owner, contractors, and affiliates from any claims arising from services rendered, including but not limited to dissatisfaction with creative results, equipment failure, weather, venue restrictions, acts of God, or any other circumstances beyond UwemMedia's reasonable control. UwemMedia's total liability shall not exceed the total amount paid by the client.</p>
+    </div>
+
+    <!-- 7. Governing Law -->
+    <div class="contract-section">
+      <div class="section-num">Section 7</div>
+      <div class="section-title">Governing Law</div>
+      <p>This agreement shall be governed by and construed in accordance with the laws of the <span class="highlight">State of Maryland</span>. Any disputes arising under this agreement shall be resolved in the courts of Baltimore County, Maryland.</p>
+    </div>
+
+  </div>
+
+  <!-- Acknowledgment Checkboxes -->
+  <div class="ack-card">
+    <div class="ack-title">Client Acknowledgment</div>
+    <div class="ack-row">
+      <input type="checkbox" id="ack1" onchange="toggleSubmit()">
+      <label for="ack1">I have read and agree to all booking, payment, and service terms outlined in this agreement.</label>
+    </div>
+    <div class="ack-row">
+      <input type="checkbox" id="ack2" onchange="toggleSubmit()">
+      <label for="ack2">I understand the deposit is <strong style="color:#ff9f47;">non-refundable</strong> and that signing this agreement constitutes a binding booking confirmation.</label>
+    </div>
+    <div class="ack-row">
+      <input type="checkbox" id="ack3" onchange="toggleSubmit()">
+      <label for="ack3">I agree not to initiate a chargeback or payment dispute for charges that comply with this agreement, and understand that doing so waives my right to receive any deliverables.</label>
+    </div>
   </div>
 
   <!-- Signature -->
@@ -248,7 +322,7 @@
 
     <div class="sig-card">
       <div class="sig-label">Your Signature</div>
-      <p class="sig-instruction">Sign below using your mouse or finger.</p>
+      <p class="sig-instruction">All three boxes above must be checked before you can sign. Sign below using your mouse or finger.</p>
       <canvas id="sigCanvas" width="648" height="160"></canvas>
       <div class="sig-actions">
         <button type="button" class="clear-btn" onclick="clearSignature()">Clear</button>
@@ -258,7 +332,7 @@
     <div class="agree-row">
       <input type="checkbox" id="agree" onchange="toggleSubmit()">
       <label for="agree" style="text-transform:none; font-size:12px; letter-spacing:0; color:var(--muted);">
-        I, <strong style="color:var(--text);">{{ s.name }}</strong>, agree to the terms of this service agreement and authorize UwemMedia to proceed upon receipt of my deposit.
+        I, <strong style="color:var(--text);">{{ s.name }}</strong>, confirm that my electronic signature above is legally binding and that I agree to the UwemMedia Service Agreement in its entirety.
       </label>
     </div>
 
@@ -275,7 +349,6 @@
   let drawing = false;
   let hasSigned = false;
 
-  // Scale canvas for retina
   function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * window.devicePixelRatio;
@@ -292,10 +365,7 @@
   function getPos(e) {
     const rect = canvas.getBoundingClientRect();
     if (e.touches) {
-      return {
-        x: e.touches[0].clientX - rect.left,
-        y: e.touches[0].clientY - rect.top
-      };
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     }
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
@@ -317,8 +387,11 @@
   }
 
   function toggleSubmit() {
+    const ack1 = document.getElementById('ack1').checked;
+    const ack2 = document.getElementById('ack2').checked;
+    const ack3 = document.getElementById('ack3').checked;
     const agreed = document.getElementById('agree').checked;
-    document.getElementById('submitBtn').disabled = !(agreed && hasSigned);
+    document.getElementById('submitBtn').disabled = !(ack1 && ack2 && ack3 && agreed && hasSigned);
   }
 
   canvas.addEventListener('mousemove', toggleSubmit);
