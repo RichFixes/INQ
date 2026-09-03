@@ -431,11 +431,6 @@ def advance_stage(token):
         db.session.commit()
     return jsonify({"success": True, "new_stage": inquiry.stage})
 
-@app.route("/debug/stripe")
-def debug_stripe():
-    key = os.environ.get("STRIPE_SECRET_KEY", "MISSING").strip().strip('"').strip("'")
-    return f"Key status: {'SET' if key != 'MISSING' else 'MISSING'} | Starts with: {key[:12]}"
-
 def is_safe_input(text):
     pattern = re.compile(r'^[a-zA-Z0-9\s.,!?-]+$')
     return bool(pattern.match(text))
